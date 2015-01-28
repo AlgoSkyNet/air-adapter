@@ -20,6 +20,8 @@ public class System {
 
     public function System() {
 
+        if(_instance) throw new Error("Only one instance of System is allowed");
+
         _eventManager = new EventManager();
         _connection = DesktopConnection.getInstance();
         _connection.addEventListener(DesktopConnectionEvent.PROCESS_DESKTOP_EVENT, processDesktopEvent);

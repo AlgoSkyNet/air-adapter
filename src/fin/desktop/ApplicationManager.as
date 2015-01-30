@@ -6,6 +6,7 @@ import fin.desktop.connection.DesktopConnection;
 import fin.desktop.connection.DesktopConnectionEvent;
 import fin.desktop.events.ApplicationEvent;
 
+
 internal class ApplicationManager {
 
     private static var _instance: ApplicationManager;

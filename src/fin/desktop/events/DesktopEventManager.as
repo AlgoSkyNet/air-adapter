@@ -27,6 +27,15 @@ public class DesktopEventManager {
         _connection.sendMessage(action, payload, callback, errorCallback);
     }
 
+    /**
+     * Registers an event listener on the specified event.
+     * @param type  Event type
+     * @param listener A listener that is called whenever an event of the specified type occurs
+     * @param callback A function that is called if the method succeeds
+     * @param errorCallback A function that is called if the method fails
+     *
+     */
+
     public function addEventListener(type: String, listener: Function, callback: Function = null, errorCallback: Function = null): void{
 
         if(_eventDispatcher.hasEventListener(type)){
@@ -46,6 +55,13 @@ public class DesktopEventManager {
         if(callback) callback();
     }
 
+    /**
+     * Removes a previously registered event listener from the specified event
+     * @param type  Event type
+     * @param listener A listener to remove
+     * @param callback A function that is called if the method succeeds
+     * @param errorCallback A function that is called if the method fails
+     */
     public function removeEventListener(type: String, listener: Function, callback: Function = null, errorCallback: Function = null): void{
 
         _eventDispatcher.removeEventListener(type, listener);

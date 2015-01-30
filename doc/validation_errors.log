@@ -1,0 +1,6 @@
+Text for param in fin.desktop:Application/getChildWindows is not valid.
+org.xml.sax.SAXParseException: The element type "fin.desktop.Window" must be terminated by the matching end-tag "</fin.desktop.Window>".
+
+Text for param in fin.desktop:Application/getGroups is not valid.
+org.xml.sax.SAXParseException: Element type "Vector." must be followed by either attribute specifications, ">" or "/>".
+

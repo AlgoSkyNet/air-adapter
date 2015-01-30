@@ -15,9 +15,10 @@ public class NotificationEvent extends Event {
 
     private var _notificationId: int;
     private var _reason: String;
-    private var _messsage: String;
+    private var _messsage: *;
 
-    public function NotificationEvent(type: String, notificationId: int,  message: String = null, reason :String = null) {
+
+    public function NotificationEvent(type: String, notificationId: int,  message: * = null, reason :String = null) {
 
         super(type);
 
@@ -26,17 +27,26 @@ public class NotificationEvent extends Event {
         _messsage = message;
     }
 
+    /**
+     * ID of the notification that dispatched the event.
+     */
     public function get notificationId():int {
 
         return _notificationId;
     }
 
+    /**
+     * if it's an error event, reason will be populated with the description of the cause of the error.
+     */
     public function get reason():String {
 
         return _reason;
     }
 
-    public function get messsage():String {
+    /**
+     * Content of the message received from notification. it can either be String or an Object.
+     */
+    public function get messsage():* {
 
         return _messsage;
     }

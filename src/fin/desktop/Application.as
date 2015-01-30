@@ -7,6 +7,13 @@ import fin.desktop.events.DesktopEventManager;
 import flash.events.EventDispatcher;
 import flash.utils.Dictionary;
 
+/**
+ * An object representing the Application.
+ * Allows the developer to execute, show and close an application,
+ * as well as show and hide an icon on Desktop. Also provides access
+ * to the Window object for the main application window to control
+ * window state such as the ability to minimize, maximize, restore, etc.
+ */
 public class Application extends DesktopEventManager{
 
     private static var _instances: Dictionary = new Dictionary();
@@ -14,6 +21,25 @@ public class Application extends DesktopEventManager{
     private var _options: ApplicationOptions;
     private var _window: Window;
 
+    /**
+     * Application Constructor
+     * @param options Settings of the application
+     * @param callback A function that is called if the method succeeds.
+     * @param errorCallback A function that is called when method fails.
+     *
+     * @see ApplicationOptions
+     * @see fin.desktop.events.DesktopEventManager
+     *
+     * @event CLOSED fin.desktop.events.ApplicationEvent [dispatched when application has closed]
+     * @event CRASHED fin.desktop.events.ApplicationEvent [dispatched when application has crashed]
+     * @event ERROR fin.desktop.events.ApplicationEvent [dispatched when there is an error]
+     * @event NOT_RESPONDING fin.desktop.events.ApplicationEvent [dispatched when  when application is not responding]
+     * @event RESPONDING fin.desktop.events.ApplicationEvent [dispatched when application is responding again]
+     * @event RUN_REQUESTED fin.desktop.events.ApplicationEvent [dispatched when there is a for running the application]
+     * @event STARTED fin.desktop.events.ApplicationEvent [dispatched when application has started]
+     * @event TRAY_ICON_CLICKED fin.desktop.events.ApplicationEvent [dispatched when the tray icon has been clicked]
+     *
+     */
     public function Application(options: ApplicationOptions, callback: Function = null, errorCallback: Function = null) {
 
         super("application");
@@ -28,62 +54,118 @@ public class Application extends DesktopEventManager{
         sendMessage("create-application", options, callback, errorCallback);
     }
 
+
     public static function getInstances(): Dictionary{
 
         return _instances;
     }
 
+    /**
+     *  Runs the application
+     * @param callback A function that is called if the method succeeds.
+     * @param errorCallback A function that is called when method fails.
+     */
     public function run(callback: Function = null, errorCallback: Function = null): void{
 
         sendMessage("run-application", createPayload(), callback, errorCallback);
     }
 
+    /**
+     * Closes the application by terminating its process.
+     * @param callback A function that is called if the method succeeds.
+     * @param errorCallback A function that is called when method fails.
+     */
     public function terminate(callback: Function = null, errorCallback: Function = null): void{
 
         sendMessage("terminate-application", createPayload(), callback, errorCallback);
     }
 
+    /**
+     * Closes the application and any child windows created by the application
+     * @param callback A function that is called if the method succeeds.
+     * @param errorCallback A function that is called when method fails.
+     */
     public function close(force: Boolean = false, callback: Function = null, errorCallback: Function = null): void{
 
         sendMessage("close-application", createPayload({force: force}), callback, errorCallback);
     }
 
-    public function remove(callback: Function = null, errorCallback: Function = null): void{
-
-        sendMessage("remove-application", createPayload(), callback, errorCallback);
-    }
-
+    /**
+     * Restarts the application
+     * @param callback A function that is called if the method succeeds.
+     * @param errorCallback A function that is called when method fails.
+     */
     public function restart(callback: Function = null, errorCallback: Function = null): void{
 
         sendMessage("restart-application", createPayload(), callback, errorCallback);
     }
 
-    public function isRunning(callback: Function = null, errorCallback: Function = null): void{
+    /**
+     * A test for if application is runngin or not.
+     * @param callback A function that gets a boolean value passed to indicating if application is running or not.
+     * @param errorCallback A function that is called when method fails.
+     */
+    public function isRunning(callback: Function, errorCallback: Function = null): void{
 
         sendMessage("is-application-running", createPayload(), callback, errorCallback);
     }
 
+    /**
+     * Sets a tray icon for the application
+     * @param enabledIcon URL to the image that gets used as enabled tray icon
+     * @param disabledIcon URL to the image that gets used as disabled tray icon
+     * @param hoverIcon URL to the image that gets used as hover(mouse over) tray icon
+     * @param callback A function that will be called if successful.
+     * @param errorCallback A function that is called on failure.
+     */
     public function setTrayIcon(enabledIcon: String, disabledIcon: String, hoverIcon: String, callback: Function = null, errorCallback: Function = null): void{
 
       //  {"action":"set-tray-icon","payload":{"uuid":"OpenFinJSAPITestBench","enabledIcon":"https://developer.openf.in/download/openfin.png","disabledIcon":"https://developer.openf.in/download/openfin.png","hoverIcon":"https://developer.openf.in/download/openfin.png"}}"
         sendMessage("set-tray-icon", createPayload({enabledIcon: enabledIcon, disabledIcon: disabledIcon, hoverIcon: hoverIcon}), callback, errorCallback);
     }
 
+    /**
+     * Removes the icon from the tray if there is one.
+     * @param callback A function that will be called if successful.
+     * @param errorCallback A function that is called on failure.
+     */
     public function removeTrayIcon(callback: Function = null, errorCallback: Function = null): void{
 
         sendMessage("remove-tray-icon", createPayload(), callback, errorCallback);
     }
 
+    /**
+     * Waits for a hanging application. This method can be called in response to an application "not-responding" to allow the application
+     * to continue and to generate another "not-responding" message after a certain period of time.
+     *
+     */
     public function wait(callback: Function = null, errorCallback: Function = null): void{
 
         sendMessage("wait-for-hung-application", createPayload(), callback, errorCallback);
     }
 
-    public function getManifest(callback: Function = null, errorCallback: Function = null): void{
+    /**
+     *
+     * Retrieves the JSON manifest that was used to create the application.
+     * Invokes the error callback if the application was not created from a manifest.
+     * callback is called and passed an Object containing the JSONObject manifest
+     * that was used to create the application.
+     *
+     * @param callback A function that will be called if successful.
+     * @param errorCallback A function that is called on failure.
+     */
+    public function getManifest(callback: Function, errorCallback: Function = null): void{
 
         sendMessage("get-application-manifest", createPayload(), callback, errorCallback);
     }
 
+    /**
+     *
+     * Retrieves an array of wrapped fin.desktop.Windows for each of the application’s child windows.
+     *
+     * @param callback A function that will be called if successful, and a Vector of fin.desktop.Window will be passed.
+     * @param errorCallback A function that is called on failure.
+     */
     public function getChildWindows(callback: Function , errorCallback: Function = null): void{
 
         var waiter: ResponseWaiter = new ResponseWaiter(onGetChildWindowsResponse, callback)
@@ -95,6 +177,13 @@ public class Application extends DesktopEventManager{
         callback(getWindowsFromArray(data));
     }
 
+    /**
+     *
+     * Retrieves an array of active window groups for all of the application's windows. Each group is represented as an Vector of wrapped fin.desktop.Window
+     *
+     * @param callback A function that will be called if successful, and nested Vector(Vector of fin.desktop.Window Vectors) will be passed.
+     * @param errorCallback A function that is called on failure.
+     */
     public function getGroups(callback: Function , errorCallback: Function = null): void{
 
         var waiter: ResponseWaiter = new ResponseWaiter(onGetGroupsCallback, callback)
@@ -144,16 +233,26 @@ public class Application extends DesktopEventManager{
         return _options.url;
     }
 
+    /**
+     * an instance of the main Window of the application.
+     * @see fin.desktop.Window
+     */
     public function get window(): Window{
 
         return _window? _window: _window = Window.createWindowUsingApplication(this);
     }
 
+    /**
+     * Attaches an Application object to an application that already exists
+     * @param uuid The UUID of the Application to wrap
+     * @return Application
+     */
     public static function wrap(uuid: String): Application{
 
         var options: ApplicationOptions = new ApplicationOptions(uuid);
         options._noRegister = true;
         return new Application(new ApplicationOptions(uuid))
     }
+
 }
 }

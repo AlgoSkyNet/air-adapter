@@ -2,6 +2,10 @@
  * Created by haseebriaz on 26/01/2015.
  */
 package fin.desktop.connection {
+
+/**
+ * @private
+ */
 public class Promise {
 
     public var _onSuccess: Function;

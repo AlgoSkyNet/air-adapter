@@ -3,6 +3,9 @@
  */
 package fin.desktop.connection {
 
+/**
+ * @private
+ */
 public class ResponseWaiter {
 
     private var _callback: Function;

@@ -101,7 +101,7 @@ public class Application extends DesktopEventManager{
     }
 
     /**
-     * A test for if application is runngin or not.
+     * A test for if application is running or not.
      * @param callback A function that gets a boolean value passed to indicating if application is running or not.
      * @param errorCallback A function that is called when method fails.
      */

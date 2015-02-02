@@ -5,6 +5,9 @@ package fin.desktop.connection {
 import com.worlize.websocket.WebSocket;
 import com.worlize.websocket.WebSocketEvent;
 import flash.events.EventDispatcher;
+import flash.filesystem.File;
+import flash.filesystem.FileMode;
+import flash.filesystem.FileStream;
 import flash.utils.Dictionary;
 
 public class DesktopConnection extends EventDispatcher{
@@ -61,6 +64,15 @@ public class DesktopConnection extends EventDispatcher{
         })
     }
 
+    private function writeTokenToTheFile(payload: Object): void{
+
+        var file:File = File.desktopDirectory.resolvePath(payload.file);
+        var stream:FileStream = new FileStream();
+        stream.open(file, FileMode.WRITE);
+        stream.writeUTFBytes(payload.token);
+        stream.close();
+    }
+
     private function sendAuthorization(): void{
 
         _state = "auth";
@@ -84,6 +96,7 @@ public class DesktopConnection extends EventDispatcher{
                     if(_onError) _onError(response.payload.reason);
                 } else {
 
+                    writeTokenToTheFile(response.payload);
                     sendAuthorization();
                 }
                 break;

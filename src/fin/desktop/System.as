@@ -287,6 +287,23 @@ public class System {
     }
 
     /**
+     * Stores a cookie in the runtime
+     *
+     * @param url The URL that the cookie is for
+     * @param name The key used to lookup the value
+     * @param value The value paired with the key (name)
+     * @param ttl The time to till the cookie expires in milliseconds.  Never expires when set to 0.  Defaults to 0.
+     * @param secure Accessible only on a secured connection (SSL)
+     * @param httpOnly Accessible only on HTTP/HTTPS.
+     * @param callback A function that is called if successful
+     * @param errorCallback A function that is called if the method fails
+     */
+    public function setCookie(url: String, name: String, value: String, ttl: Number, secure: Boolean, httpOnly: Boolean, callback: Function, errorCallback: Function = null): void{
+
+        sendMessage("set-cookie", {url: url, name: name, value: value, ttl: ttl, secure: secure, httpOnly: httpOnly}, callback, errorCallback);
+    }
+
+    /**
      * Registers an event listener on the specified event
      * @param type Type of the event
      * @param listener The listener function for the event

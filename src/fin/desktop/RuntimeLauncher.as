@@ -15,7 +15,7 @@ import flash.utils.ByteArray;
 
 public class RuntimeLauncher {
 
-    private var runtimePath: String = "AppData\\Local\\OpenFin\\runtime\\3.0.2.11a\\OpenFin\\OpenFin.exe";
+    public static var runtimePath: String = "AppData\\Local\\OpenFin\\runtime\\3.0.2.11a\\OpenFin\\OpenFin.exe";
     private var address: String;
     private var port: String;
     private var jsonURL: String;

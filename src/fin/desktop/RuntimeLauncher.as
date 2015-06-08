@@ -15,13 +15,13 @@ import flash.utils.ByteArray;
 
 public class RuntimeLauncher {
 
-    private var runtimePath: String = "AppData\\Local\\OpenFin\\runtime\\3.0.2.11a\\OpenFin\\OpenFin.exe";
+    private var runtimePath: String = "AppData\\Local\\OpenFin\\OpenFinRVM.exe";
     private var address: String;
     private var port: String;
     private var jsonURL: String;
     private var onComplete: Function;
 
-    public function RuntimeLauncher(runtimePath: String, appJsonURL: String, onComplete) {
+    public function RuntimeLauncher(runtimePath: String, appJsonURL: String, onComplete: Function) {
 
         this.runtimePath = runtimePath;
         jsonURL = appJsonURL;
@@ -36,10 +36,10 @@ public class RuntimeLauncher {
         nativeProcessStartupInfo.executable = file;
 
         var processArgs: Vector.<String> = new Vector.<String>();
-        processArgs[0] = "--startup-url=" + jsonURL;
+        processArgs[0] = "--config=" + jsonURL;
         nativeProcessStartupInfo.arguments = processArgs;
 
-        var runtimeProcess = new NativeProcess();
+        var runtimeProcess: NativeProcess = new NativeProcess();
         runtimeProcess.start(nativeProcessStartupInfo);
 
         if(runtimeProcess.running){
@@ -54,7 +54,7 @@ public class RuntimeLauncher {
         var file: File = File.applicationDirectory.resolvePath("server.exe");
         nativeProcessStartupInfo.executable = file;
 
-        var serverProcess = new NativeProcess();
+        var serverProcess: NativeProcess = new NativeProcess();
         serverProcess.start(nativeProcessStartupInfo);
         serverProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA, onOutputData);
     }

@@ -11,11 +11,10 @@ public class ApplicationOptions {
 
     internal var _noRegister: Boolean;
 
-    public function ApplicationOptions(uuid: String, name: String = null, url: String = null) {
+    public function ApplicationOptions(uuid: String, url: String = null) {
 
         this.url = url;
-        this.uuid = uuid;
-        this.name = name;
+        this.name = this.uuid = uuid;
         this.mainWindowOptions = new WindowOptions(uuid, name);
     }
 }

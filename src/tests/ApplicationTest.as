@@ -14,10 +14,22 @@ public class ApplicationTest {
 
     public function ApplicationTest() {
 
-        var app: Application = new Application(new ApplicationOptions("cpuTest2", "cpuTest2", "http://www.google.com"), function(value){
+        var applicationOptions: ApplicationOptions = new ApplicationOptions("child","http://www.google.com");
+        var windowOptions: WindowOptions = new WindowOptions();
+        windowOptions.minimizable = true;
+        windowOptions.maximizable = true;
+        windowOptions.autoShow = true;
+        windowOptions.showTaskbarIcon = true;
+        windowOptions.frame = true;
 
+        var app: Application = new Application(applicationOptions, function(value){
+            trace("app created");
             showWindow(app);
+            app.run();
         }, function(reason: String){
+
+
+
 
             showWindow(app);
         });
@@ -27,26 +39,20 @@ public class ApplicationTest {
 
         trace("application started", event.target);
         var app: Application = event.application;
+        app.window.show();
         app.getGroups(function(groups){
 
-        })
+        });
         app.addEventListener(ApplicationEvent.TRAY_ICON_CLICKED, function(event: ApplicationEvent){
 
             trace("icon was clicked", event.payload.x, event.payload.y);
             event.application.removeTrayIcon();
         });
-
-        app.setTrayIcon("https://developer.openf.in/download/openfin.png","https://developer.openf.in/download/openfin.png", "https://developer.openf.in/download/openfin.png", function(){
-
-            trace("application restarted");
-        }, function(reason: String){
-
-            trace("could not set icon", reason);
-        });
     }
 
     private function showWindow(app: Application): void{
 
+        trace("window");
         app.addEventListener(ApplicationEvent.STARTED, onAppStarted);
         app.addEventListener(ApplicationEvent.CLOSED, function(event: ApplicationEvent){
 
@@ -55,20 +61,13 @@ public class ApplicationTest {
         app.run();
 
         var window: Window = app.window;
+        window.show();
         window.addEventListener(WindowEvent.BOUNDS_CHANGED, onBoundsChanged);
         window.addEventListener(WindowEvent.BOUNDS_CHANGING, onBoundsChanging);
         window.addEventListener(WindowEvent.BLURRED, onBlurr);
         window.moveTo(0, 0);
 
-        var options: WindowOptions = new WindowOptions();
-        options.opacity = 1;
-        options.frame = true;
-        options.minimizable = true;
-        options.maximizable = true;
-        options.draggable = true;
-        window.updateOptions(options, function(){
 
-        });
     }
 
     private function onBoundsChanged(event: WindowEvent): void{
@@ -86,6 +85,7 @@ public class ApplicationTest {
     private function onBlurr(event: WindowEvent): void{
 
         trace("window blurred!");
+
     }
 }
 }

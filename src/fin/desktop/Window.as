@@ -3,6 +3,8 @@
  */
 package fin.desktop {
 
+import com.openfin.OpenfinNativeExtention;
+
 import fin.desktop.connection.ResponseWaiter;
 import fin.desktop.events.DesktopEventManager;
 import fin.desktop.events.WindowEvent;
@@ -19,9 +21,10 @@ import flash.utils.Dictionary;
 public class Window extends DesktopEventManager{
 
     private static var _instances: Dictionary = new Dictionary();
+    private static var ane: OpenfinNativeExtention;
 
-    private var _uuid: String;
-    private var _name: String;
+    public var _uuid: String;
+    public var _name: String;
 
     /**
      * Window constructor
@@ -36,19 +39,26 @@ public class Window extends DesktopEventManager{
         _uuid = uuid;
         _name = name;
 
-        _instances[_uuid + _name] = this;
+        _instances[_uuid + name] = this;
         _defaultPayload = {uuid: uuid, name: name};
 
         WindowManager.initialise();
         //  sendMessage("register-child-window-settings", options, callback, errorCallback);
 
-        //"{"action":"register-child-window-load-callback","payload":{"uuid":"OpenFinJSAPITestBench","name":"childWindow"},"messageId":2}"
-        //{"action":"show-window","payload":{"uuid":"OpenFinJSAPITestBench","name":"childWindow"}}"
+        //"{"action":"register-child-window-load-callback","payload":{"uuid":"OpenFinJSAPITestBench","_name":"childWindow"},"messageId":2}"
+        //{"action":"show-window","payload":{"uuid":"OpenFinJSAPITestBench","_name":"childWindow"}}"
     }
 
     public static function createWindowUsingApplication(application: Application): Window {
 
         return new Window(application.uuid, application.name? application.name: application.uuid);
+    }
+
+    public static function registerExternalWindow(uuid: String, name: String, callback: Function = null, errorCallback: Function = null): Window{
+
+        if(!ane)ane = new OpenfinNativeExtention();
+        sendMessage("register-external-window", {topic: "application", hwnd: ane.getHWND() , uuid:uuid, name: name}, callback, errorCallback);
+        return new Window(uuid, name);
     }
 
     public static function getInstances(): Dictionary{
@@ -200,6 +210,7 @@ public class Window extends DesktopEventManager{
 
     public function joinGroup(window: Window, callback: Function = null, errorCallback: Function = null): void{
 
+
         sendMessage("join-window-group", createPayload({groupingWindowName: window._name}), callback, errorCallback);
     }
 
@@ -304,6 +315,8 @@ public class Window extends DesktopEventManager{
 
         sendMessage("set-window-bounds", createPayload({left: left, top: top, width:width, height:height}), callback, errorCallback);
     }
+
+
 
 }
 }

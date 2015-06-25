@@ -10,10 +10,11 @@ public class InterApplicationBusTest {
 
     public function InterApplicationBusTest() {
 
-        bus = new InterApplicationBus();
+        bus = InterApplicationBus.getInstance();
+      //  bus.send("interapp", "test", "Test EMssage");
         bus.addSubscribeListener(onSubscriberAdded);
         bus.addUnsubscribeListener(onSubscriberRemoved);
-        bus.subscribe("helloOpenfin", "testmessages", onTestMessages, onSubsciptionSuccess);
+        bus.subscribe("interapp", "testmessages", onTestMessages, onSubsciptionSuccess);
     }
 
     private function onTestMessages(message: String, uuid: String): void{
@@ -23,7 +24,7 @@ public class InterApplicationBusTest {
 
     private function onSubsciptionSuccess(): void{
 
-        bus.subscribe("helloOpenfin", "subscriptiontest", onMessage);
+        bus.subscribe("interapp", "subscriptiontest", onMessage);
         bus.subscribe("*", "broadcasttest", onMessage);
     }
 

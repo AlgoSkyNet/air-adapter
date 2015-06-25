@@ -9,8 +9,14 @@ import fin.desktop.events.NotificationEvent;
 public class NotificationTest {
     public function NotificationTest() {
 
+        var notification2: Notification = new Notification(new NotificationOptions("http://demoappdirectory.openf.in/desktop/config/apps/OpenFin/HelloOpenFin/views/notification.html",
+                "test message2!", "30000"));
+
+        var notification2: Notification = new Notification(new NotificationOptions("http://demoappdirectory.openf.in/desktop/config/apps/OpenFin/HelloOpenFin/views/notification.html",
+                "test message3!", "30000"));
+
         var notification: Notification =  new Notification(new NotificationOptions("http://demoappdirectory.openf.in/desktop/config/apps/OpenFin/HelloOpenFin/views/notification.html",
-                                                    "test message!", "1000"));
+                                                    "test message1!", "60000"));
 
         notification.addEventListener(NotificationEvent.SHOW, onShow);
         notification.addEventListener(NotificationEvent.CLICK, onClick);
@@ -18,6 +24,7 @@ public class NotificationTest {
         notification.addEventListener(NotificationEvent.DISMISSED, onDismiss);
         notification.addEventListener(NotificationEvent.ERROR, onError);
         notification.addEventListener(NotificationEvent.MESSAGE, onMessage);
+
     }
 
     private function onShow(event: NotificationEvent): void{

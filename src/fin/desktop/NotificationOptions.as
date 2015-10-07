@@ -4,7 +4,7 @@
 package fin.desktop {
 public class NotificationOptions {
 
-    private static var ID: int = 0;
+    private static var ID: int = 1;
 
     private var _url: String;
     private var _message: String;

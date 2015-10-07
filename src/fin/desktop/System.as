@@ -67,7 +67,7 @@ public class System {
     /**
      * Retrieves an array of all processes that are currently running
      * Each element in the array is an object containing the uuid
-     * and the name of the application to which the process belongs.
+     * and the _name of the application to which the process belongs.
      * @param callback A function that is called if successful
      * @param errorCallback A function that is called if the method fails
      */
@@ -80,7 +80,7 @@ public class System {
      * Retrieves an array of data objects for all available logs
      * Each object in the returned array takes the form:
      *   {
-     *       name: (string) the filename of the log,
+     *       _name: (string) the filename of the log,
      *       size: (integer) the size of the log in bytes,
      *       date: (integer) the unix time at which the log was created
      *    }
@@ -116,14 +116,14 @@ public class System {
      *         {
      *             uuid: (string) uuid of the application,
      *             mainWindow: {
-     *                 name: (string) name of the main window,
+     *                 _name: (string) _name of the main window,
      *                 top: (integer) top-most coordinate of the main window,
      *                 right: (integer) right-most coordinate of the main window,
      *                 bottom: (integer) bottom-most coordinate of the main window,
      *                 left: (integer) left-most coordinate of the main window
      *             },
      *             childWindows: [{
-     *                     name: (string) name of the child window,
+     *                     _name: (string) _name of the child window,
      *                     top: (integer) top-most coordinate of the child window,
      *                     right: (integer) right-most coordinate of the child window,
      *                     bottom: (integer) bottom-most coordinate of the child window,
@@ -291,7 +291,7 @@ public class System {
      *
      * @param url The URL that the cookie is for
      * @param name The key used to lookup the value
-     * @param value The value paired with the key (name)
+     * @param value The value paired with the key (_name)
      * @param ttl The time to till the cookie expires in milliseconds.  Never expires when set to 0.  Defaults to 0.
      * @param secure Accessible only on a secured connection (SSL)
      * @param httpOnly Accessible only on HTTP/HTTPS.

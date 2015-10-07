@@ -22,9 +22,9 @@ public class DesktopEventManager {
         _connection = DesktopConnection.getInstance();
     }
 
-    protected function sendMessage(action: String, payload: Object, callback: Function = null, errorCallback: Function = null): void{
+    protected static function sendMessage(action: String, payload: Object, callback: Function = null, errorCallback: Function = null): void{
 
-        _connection.sendMessage(action, payload, callback, errorCallback);
+        DesktopConnection.getInstance().sendMessage(action, payload, callback, errorCallback);
     }
 
     /**

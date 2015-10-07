@@ -3,8 +3,11 @@
  */
 package fin.desktop.connection {
 import com.worlize.websocket.WebSocket;
+import com.worlize.websocket.WebSocketError;
+import com.worlize.websocket.WebSocketErrorEvent;
 import com.worlize.websocket.WebSocketEvent;
 import flash.events.EventDispatcher;
+import flash.events.IOErrorEvent;
 import flash.filesystem.File;
 import flash.filesystem.FileMode;
 import flash.filesystem.FileStream;
@@ -45,7 +48,16 @@ public class DesktopConnection extends EventDispatcher{
         _webSocket = new WebSocket("ws://" + host + ":" + port, "*");
         _webSocket.addEventListener(WebSocketEvent.OPEN, onOpen);
         _webSocket.addEventListener(WebSocketEvent.MESSAGE, onMessage);
-        _webSocket.connect();
+        _webSocket.addEventListener(WebSocketErrorEvent.CONNECTION_FAIL, onConnectionFail);
+        _webSocket.addEventListener(WebSocketErrorEvent.ABNORMAL_CLOSE, onAbnormalConnection);
+        _webSocket.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+
+        try{
+            _webSocket.connect();
+        } catch (error: *){
+
+            if(_onError) _onError(error.message);
+        }
     }
 
     private function onOpen(event: WebSocketEvent): void{
@@ -180,10 +192,27 @@ public class DesktopConnection extends EventDispatcher{
         if(!value && value !== false){
 
             return undefined ;
+
         } else {
 
             return value;
         }
+    }
+
+    private function onConnectionFail(event: WebSocketErrorEvent): void{
+        trace(event.text);
+        if(_onError) _onError(event.errorID + ", " + event.text);
+    }
+
+    private function onAbnormalConnection(event: WebSocketErrorEvent): void{
+
+        trace(event.text);
+        if(_onError) _onError(event.errorID + ", " + event.text);
+    }
+
+    private function onIOError(event: IOErrorEvent): void{
+
+        if(_onError) _onError(event.errorID + ", " + event.text);
     }
 }
 }

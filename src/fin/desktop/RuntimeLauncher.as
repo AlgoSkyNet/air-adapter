@@ -18,23 +18,24 @@ import flash.utils.ByteArray;
 import mx.utils.UIDUtil;
 
 public class RuntimeLauncher {
-
     private var ane: OpenfinNativeExtention;
     private var runtimeWorkPath: String = "AppData\\Local\\OpenFin";
     private var runtimeExec: String = "OpenFinRVM.exe";
-    private var address: String;
     private var port: String;
-    private var jsonURL: String;
     private var onComplete: Function;
+    private var runtimeVersion: String; // from app manifest
+    private var securityRealm: String;  // from app manifest
+    private var desktopConnection: DesktopConnection;
+    private var runtimeConfiguration: RuntimeConfiguration;
 
-    public function RuntimeLauncher(appJsonURL: String, onComplete: Function) {
+    public function RuntimeLauncher(runtimeConfiguration: RuntimeConfiguration) {
+        this.runtimeConfiguration = runtimeConfiguration;
         this.ane = new OpenfinNativeExtention();
-        jsonURL = appJsonURL;
         this.onComplete = onComplete;
-        initialiseProcess(appJsonURL);
+        getAppManifest();
     }
 
-    private function initialiseProcess(jsonURL: String): void{
+    private function initialiseProcess(): void{
         var namedPipeName:String = "OpenfinDesktop." + UIDUtil.createUID();
         trace("calling discoverRuntime " + namedPipeName);
         ane.addEventListener(StatusEvent.STATUS, onStatusEvent);
@@ -46,77 +47,63 @@ public class RuntimeLauncher {
         nativeProcessStartupInfo.executable = execFile;
         trace("invoking " + execFile.nativePath);
         var processArgs: Vector.<String> = new Vector.<String>();
-        processArgs[0] = "--config=" + jsonURL;
+        processArgs[0] = "--config=" + this.runtimeConfiguration.appManifestUrl;
         processArgs[1] = '--runtime-arguments=--runtime-information-channel-v6=' + namedPipeName;
         trace("starting", processArgs[0], processArgs[1]);
         nativeProcessStartupInfo.arguments = processArgs;
         var runtimeProcess: NativeProcess = new NativeProcess();
         runtimeProcess.start(nativeProcessStartupInfo);
+//        runtimeProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA, onOutputData);
 
         if(runtimeProcess.running){
         }
     }
 
     private function launchProxyService(): void{
-
         var nativeProcessStartupInfo: NativeProcessStartupInfo = new NativeProcessStartupInfo();
         var file: File = File.applicationDirectory.resolvePath("server.exe");
         nativeProcessStartupInfo.executable = file;
-
         var serverProcess: NativeProcess = new NativeProcess();
         serverProcess.start(nativeProcessStartupInfo);
         serverProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA, onOutputData);
     }
 
     private function onStatusEvent(event:StatusEvent): void {
-        trace("received status message:" + event.code);
-        trace("received status message:" + event.level);
+        trace("received status message:", event.code);
+        trace("received status message:", event.level);
+        if (event.code == "PortDiscoveryMessage") {
+            // {"action":"runtime-information","payload":{"version":"7.53.20.20","sslPort":-1,"port":9696,"requestedVersion":"beta","runtimeInformationChannel":"OpenfinDesktop.9418784F-DE54-BD14-36D1-4BF501C05FC7"}}
+            var data: Object = JSON.parse(event.level);
+            if (this.runtimeVersion == data.payload.requestedVersion) {
+                this.port = data.payload.port;
+                trace("Found matching Runtime", data.payload.version, "at port", this.port);
+                desktopConnection = new DesktopConnection(runtimeConfiguration.connectionUuid, "localhost", port,
+                        runtimeConfiguration.onConnectionReady, runtimeConfiguration.onConnectionError);
+            }
+        }
     }
 
     private function onOutputData(event: ProgressEvent): void{
-
         var process: NativeProcess = event.target as NativeProcess;
         var bytes: ByteArray = new ByteArray();
         process.standardOutput.readBytes(bytes);
         process.exit(true);
-
-        var config: Object = getConfig(bytes.toString());
-        var service: Object = config.services[0];
-        address = service.addr;
-        port = service.port;
-
-        getUUID(jsonURL);
+        trace(bytes.toString());
     }
 
-    private function getConfig(output: String): Object{
-
-        var index: int = output.indexOf("SURVEYKTHXBAI\r");
-        return JSON.parse(output.substring(index + 16, output.indexOf("SurveyServer::Run", index)));
-    }
-
-    private function getUUID(jsonURL: String): void{
-
+    private function getAppManifest(): void {
+        trace("retrieving" + this.runtimeConfiguration.appManifestUrl);
         var urlLoader: URLLoader = new URLLoader();
         urlLoader.addEventListener(Event.COMPLETE, this._onJSONLoaded);
-        urlLoader.load(new URLRequest(jsonURL));
+        urlLoader.load(new URLRequest(this.runtimeConfiguration.appManifestUrl));
     }
 
     private function _onJSONLoaded(event: Event): void{
-
         var urlLoader: URLLoader = event.target as URLLoader;
         var data: Object = JSON.parse(urlLoader.data);
-        trace(data.startup_app.uuid);
-        new DesktopConnection(data.startup_app.uuid, address, port , onConnectionReady, onConnectionError);
-    }
-
-    private function onConnectionReady(): void{
-
-        onComplete();
-    }
-
-    private function onConnectionError(reason: String): void{
-
-        trace("there was an error connecting: ", reason);
+        runtimeVersion = data.runtime.version;
+        trace("runtime version from manifest", runtimeVersion);
+        initialiseProcess();
     }
 
 }

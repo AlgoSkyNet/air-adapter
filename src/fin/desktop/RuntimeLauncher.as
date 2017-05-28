@@ -78,7 +78,8 @@ public class RuntimeLauncher {
                 this.port = data.payload.port;
                 trace("Found matching Runtime", data.payload.version, "at port", this.port);
                 desktopConnection = new DesktopConnection(runtimeConfiguration.connectionUuid, "localhost", port,
-                        runtimeConfiguration.onConnectionReady, runtimeConfiguration.onConnectionError);
+                        runtimeConfiguration.onConnectionReady, runtimeConfiguration.onConnectionError,
+                        runtimeConfiguration.onConnectionClose);
             }
         }
     }

@@ -3,6 +3,7 @@
  */
 package fin.desktop.connection {
 import com.worlize.websocket.WebSocket;
+import com.worlize.websocket.WebSocketCloseStatus;
 import com.worlize.websocket.WebSocketError;
 import com.worlize.websocket.WebSocketErrorEvent;
 import com.worlize.websocket.WebSocketEvent;
@@ -23,13 +24,14 @@ public class DesktopConnection extends EventDispatcher{
     private var _uuid: String;
     private var _onReady: Function;
     private var _onError: Function;
+    private var _onClose: Function;
     private var _messageHandlers:Dictionary;
 
     public static function getInstance(): DesktopConnection{
 
         return _instance;
     }
-    public function DesktopConnection(uuid: String, host: String, port: String, onReady: Function, onError: Function = null) {
+    public function DesktopConnection(uuid: String, host: String, port: String, onReady: Function, onError: Function = null, onClose = null) {
 
         if(_instance) throw new Error("Only one instance of Desktop Connection is allowed, use DesktopConnection.getInstance()");
 
@@ -37,6 +39,7 @@ public class DesktopConnection extends EventDispatcher{
         _uuid = uuid;
         _onReady = onReady;
         _onError = onError;
+        _onClose = onClose;
 
         _messageHandlers = new Dictionary();
 
@@ -48,6 +51,7 @@ public class DesktopConnection extends EventDispatcher{
         _webSocket = new WebSocket("ws://" + host + ":" + port, "*");
         _webSocket.addEventListener(WebSocketEvent.OPEN, onOpen);
         _webSocket.addEventListener(WebSocketEvent.MESSAGE, onMessage);
+        _webSocket.addEventListener(WebSocketEvent.CLOSED, onClose);
         _webSocket.addEventListener(WebSocketErrorEvent.CONNECTION_FAIL, onConnectionFail);
         _webSocket.addEventListener(WebSocketErrorEvent.ABNORMAL_CLOSE, onAbnormalConnection);
         _webSocket.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
@@ -197,6 +201,11 @@ public class DesktopConnection extends EventDispatcher{
 
             return value;
         }
+    }
+
+    private function onClose(event: WebSocketEvent) {
+        trace(event.toString());
+        if (_onClose) _onClose(event);
     }
 
     private function onConnectionFail(event: WebSocketErrorEvent): void{

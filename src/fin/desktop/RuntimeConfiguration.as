@@ -5,6 +5,7 @@ package fin.desktop {
 public class RuntimeConfiguration {
     private var _connectionUuid: String;
     private var _appManifestUrl: String;
+    private var _connectionTimeout = 10000;
     private var _onConnectionReady: Function;
     private var _onConnectionClose: Function;
     private var _onConnectionError: Function;
@@ -23,6 +24,14 @@ public class RuntimeConfiguration {
 
     public function set appManifestUrl(value:String):void {
         _appManifestUrl = value;
+    }
+    
+    public function get connectionTimeout():* {
+        return _connectionTimeout;
+    }
+
+    public function set connectionTimeout(value):void {
+        _connectionTimeout = value;
     }
 
     public function get onConnectionReady():Function {

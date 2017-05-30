@@ -39,7 +39,7 @@ public class RuntimeLauncher {
         var namedPipeName:String = "OpenfinDesktop." + UIDUtil.createUID();
         trace("calling discoverRuntime " + namedPipeName);
         ane.addEventListener(StatusEvent.STATUS, onStatusEvent);
-        ane.discoverRuntime("chrome." + namedPipeName, 10000);
+        ane.discoverRuntime("chrome." + namedPipeName, runtimeConfiguration.connectionTimeout);
         var nativeProcessStartupInfo: NativeProcessStartupInfo = new NativeProcessStartupInfo();
         var workDir: File = File.userDirectory.resolvePath(runtimeWorkPath);
         nativeProcessStartupInfo.workingDirectory = workDir;
@@ -71,7 +71,7 @@ public class RuntimeLauncher {
     private function onStatusEvent(event:StatusEvent): void {
         trace("received status message:", event.code);
         trace("received status message:", event.level);
-        if (event.code == "PortDiscoveryMessage") {
+        if (event.code == "PortDiscoverySuccessMessage") {
             // {"action":"runtime-information","payload":{"version":"7.53.20.20","sslPort":-1,"port":9696,"requestedVersion":"beta","runtimeInformationChannel":"OpenfinDesktop.9418784F-DE54-BD14-36D1-4BF501C05FC7"}}
             var data: Object = JSON.parse(event.level);
             if (this.runtimeVersion == data.payload.requestedVersion) {
@@ -81,6 +81,9 @@ public class RuntimeLauncher {
                         runtimeConfiguration.onConnectionReady, runtimeConfiguration.onConnectionError,
                         runtimeConfiguration.onConnectionClose);
             }
+        }
+        if (event.code == "PortDiscoveryErrorMessage") {
+            runtimeConfiguration.onConnectionError(event.level);
         }
     }
 

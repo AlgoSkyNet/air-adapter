@@ -205,7 +205,7 @@ public class DesktopConnection extends EventDispatcher{
 
     private function onClose(event: WebSocketEvent) {
         trace(event.toString());
-        if (_onClose) _onClose(event);
+        if (_onClose) _onClose(event.type);
     }
 
     private function onConnectionFail(event: WebSocketErrorEvent): void{

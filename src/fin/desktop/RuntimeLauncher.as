@@ -22,7 +22,6 @@ public class RuntimeLauncher {
     private var runtimeWorkPath: String = "AppData\\Local\\OpenFin";
     private var runtimeExec: String = "OpenFinRVM.exe";
     private var port: String;
-    private var onComplete: Function;
     private var runtimeVersion: String; // from app manifest
     private var securityRealm: String;  // from app manifest
     private var desktopConnection: DesktopConnection;
@@ -31,7 +30,6 @@ public class RuntimeLauncher {
     public function RuntimeLauncher(runtimeConfiguration: RuntimeConfiguration) {
         this.runtimeConfiguration = runtimeConfiguration;
         this.ane = new OpenfinNativeExtention();
-        this.onComplete = onComplete;
         getAppManifest();
     }
 
@@ -39,33 +37,11 @@ public class RuntimeLauncher {
         var namedPipeName:String = "OpenfinDesktop." + UIDUtil.createUID();
         trace("calling discoverRuntime " + namedPipeName);
         ane.addEventListener(StatusEvent.STATUS, onStatusEvent);
-        ane.discoverRuntime("chrome." + namedPipeName, runtimeConfiguration.connectionTimeout);
-        var nativeProcessStartupInfo: NativeProcessStartupInfo = new NativeProcessStartupInfo();
         var workDir: File = File.userDirectory.resolvePath(runtimeWorkPath);
-        nativeProcessStartupInfo.workingDirectory = workDir;
-        var execFile: File = File.userDirectory.resolvePath(runtimeWorkPath + "\\" + runtimeExec);
-        nativeProcessStartupInfo.executable = execFile;
-        trace("invoking " + execFile.nativePath);
-        var processArgs: Vector.<String> = new Vector.<String>();
-        processArgs[0] = "--config=" + this.runtimeConfiguration.appManifestUrl;
-        processArgs[1] = '--runtime-arguments=--runtime-information-channel-v6=' + namedPipeName;
-        trace("starting", processArgs[0], processArgs[1]);
-        nativeProcessStartupInfo.arguments = processArgs;
-        var runtimeProcess: NativeProcess = new NativeProcess();
-        runtimeProcess.start(nativeProcessStartupInfo);
-//        runtimeProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA, onOutputData);
-
-        if(runtimeProcess.running){
-        }
-    }
-
-    private function launchProxyService(): void{
-        var nativeProcessStartupInfo: NativeProcessStartupInfo = new NativeProcessStartupInfo();
-        var file: File = File.applicationDirectory.resolvePath("server.exe");
-        nativeProcessStartupInfo.executable = file;
-        var serverProcess: NativeProcess = new NativeProcess();
-        serverProcess.start(nativeProcessStartupInfo);
-        serverProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA, onOutputData);
+        var args: String = "--config=" + this.runtimeConfiguration.appManifestUrl + 
+                            ' --runtime-arguments=--runtime-information-channel-v6=' + namedPipeName;
+        trace("invoking ", workDir.nativePath, runtimeExec, args);
+        ane.launchRuntime(workDir.nativePath, runtimeExec, args, "chrome." + namedPipeName, runtimeConfiguration.connectionTimeout);
     }
 
     private function onStatusEvent(event:StatusEvent): void {
@@ -91,7 +67,8 @@ public class RuntimeLauncher {
         var process: NativeProcess = event.target as NativeProcess;
         var bytes: ByteArray = new ByteArray();
         process.standardOutput.readBytes(bytes);
-        process.exit(true);
+        process.closeInput();
+//        process.exit(false);
         trace(bytes.toString());
     }
 

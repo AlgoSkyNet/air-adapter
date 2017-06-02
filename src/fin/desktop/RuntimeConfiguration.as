@@ -6,6 +6,7 @@ public class RuntimeConfiguration {
     private var _connectionUuid: String;
     private var _appManifestUrl: String;
     private var _connectionTimeout = 10000;
+    private var _runtimeWorkPath: String;
     private var _onConnectionReady: Function;
     private var _onConnectionClose: Function;
     private var _onConnectionError: Function;
@@ -26,6 +27,14 @@ public class RuntimeConfiguration {
         _appManifestUrl = value;
     }
     
+    public function get runtimeWorkPath():String {
+        return _runtimeWorkPath;
+    }
+
+    public function set runtimeWorkPath(value:String):void {
+        _runtimeWorkPath = value;
+    }
+
     public function get connectionTimeout():* {
         return _connectionTimeout;
     }

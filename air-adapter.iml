@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="air-adapter">
     <configurations>
-      <configuration name="air-adapter" target-platform="Desktop" pure-as="true" output-type="Library" output-file="air-adapter.swc" output-folder="$MODULE_DIR$/out/production/air-adapter">
+      <configuration name="air-adapter" target-platform="Desktop" pure-as="true" output-type="Library" output-file="OpenFinAirAdapter-6.0.1.swc" output-folder="$MODULE_DIR$/out/production/air-adapter">
         <dependencies>
           <entries>
             <entry library-id="ebe49710-1363-40b8-a78d-46daa129e319">
@@ -43,7 +43,7 @@
       <library type="flex">
         <properties id="fd9196a1-189b-4031-93e0-f86089029f44" />
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/OpenFinAirNativeExtension.ane!/" />
+          <root url="jar://$MODULE_DIR$/lib/OpenFinAirNativeExtension-6.0.1.ane!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

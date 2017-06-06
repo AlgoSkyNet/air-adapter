@@ -28,6 +28,8 @@ public class RuntimeLauncher {
     private var desktopConnection: DesktopConnection;
     private var runtimeConfiguration: RuntimeConfiguration;
 
+    private static var SECURITY_REALM_SETTING: String = "--security-realm="; // from runtime->arguments
+
     private static var DEFAULT_RUNTIME_WORK_PATH   : String = "AppData\\Local\\OpenFin";
     private static var DEFAULT_INSTALLER_WORK_PATH : String = "AppData\\Local\\OpenFin";
 
@@ -86,14 +88,16 @@ public class RuntimeLauncher {
         trace("received status message:", event.code);
         trace("received status message:", event.level);
         if (event.code == "PortDiscoverySuccessMessage") {
-            // {"action":"runtime-information","payload":{"version":"7.53.20.20","sslPort":-1,"port":9696,"requestedVersion":"beta","runtimeInformationChannel":"OpenfinDesktop.9418784F-DE54-BD14-36D1-4BF501C05FC7"}}
+            // {"action":"runtime-information","payload":{"version":"7.53.20.20","sslPort":-1,"port":9696,"requestedVersion":"beta","securityRealm":"nucleus","runtimeInformationChannel":"OpenfinDesktop.81309855-23E6-E90F-B8B5-7E862895AB5A"}}
             var data: Object = JSON.parse(event.level);
-            if (this.runtimeVersion == data.payload.requestedVersion) {
+            if (matchRuntimeInstance(data.payload.requestedVersion, data.payload.securityRealm)) {
                 this.port = data.payload.port;
                 trace("Found matching Runtime", data.payload.version, "at port", this.port);
                 desktopConnection = new DesktopConnection(runtimeConfiguration.connectionUuid, "localhost", port,
                         runtimeConfiguration.onConnectionReady, runtimeConfiguration.onConnectionError,
                         runtimeConfiguration.onConnectionClose);
+            } else {
+                trace("Ignoring PortDiscoverySuccessMessage");
             }
         }
         if (event.code == "PortDiscoveryErrorMessage") {
@@ -101,7 +105,27 @@ public class RuntimeLauncher {
         }
     }
 
-    private function onOutputData(event: ProgressEvent): void{
+    private function matchRuntimeInstance(requestedVersion: String, reportedSecurityRealm: String): Boolean {
+        if (this.runtimeVersion != null && this.securityRealm != null){
+            return this.runtimeVersion == requestedVersion && this.securityRealm == reportedSecurityRealm;
+        }
+        else if (runtimeVersion != null) {
+            return this.runtimeVersion == requestedVersion && reportedSecurityRealm == null;
+        }
+        else {
+            return false;
+        }
+    }
+
+import flash.desktop.NativeProcess;
+import flash.events.Event;
+import flash.events.ProgressEvent;
+import flash.net.URLLoader;
+import flash.net.URLRequest;
+import flash.utils.ByteArray;
+
+
+private function onOutputData(event: ProgressEvent): void{
         var process: NativeProcess = event.target as NativeProcess;
         var bytes: ByteArray = new ByteArray();
         process.standardOutput.readBytes(bytes);
@@ -121,6 +145,16 @@ public class RuntimeLauncher {
         var urlLoader: URLLoader = event.target as URLLoader;
         var data: Object = JSON.parse(urlLoader.data);
         runtimeVersion = data.runtime.version;
+        if (data.runtime.arguments != null) {
+            var results:Array = data.runtime.arguments.split(" ");
+            for (var i:String in results) {
+                var setting: String = results[i];
+                if (setting.indexOf(SECURITY_REALM_SETTING) == 0) {
+                    this.securityRealm = setting.substr(SECURITY_REALM_SETTING.length);
+                    trace("runtime security realm from manifest", this.securityRealm);
+                }
+            }
+        }
         trace("runtime version from manifest", runtimeVersion);
         initialiseProcess();
     }

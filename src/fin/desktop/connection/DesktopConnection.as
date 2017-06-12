@@ -7,12 +7,21 @@ import com.worlize.websocket.WebSocketCloseStatus;
 import com.worlize.websocket.WebSocketError;
 import com.worlize.websocket.WebSocketErrorEvent;
 import com.worlize.websocket.WebSocketEvent;
+
+import fin.desktop.RuntimeLauncher;
+
+import fin.desktop.logging.ILogger;
+import fin.desktop.logging.LoggerFactory;
+
 import flash.events.EventDispatcher;
 import flash.events.IOErrorEvent;
 import flash.filesystem.File;
 import flash.filesystem.FileMode;
 import flash.filesystem.FileStream;
 import flash.utils.Dictionary;
+import flash.utils.getQualifiedClassName;
+
+import mx.core.ILayoutDirectionElement;
 
 public class DesktopConnection extends EventDispatcher{
 
@@ -26,7 +35,8 @@ public class DesktopConnection extends EventDispatcher{
     private var _onError: Function;
     private var _onClose: Function;
     private var _messageHandlers:Dictionary;
-
+    private var _logger:ILogger;
+    
     public static function getInstance(): DesktopConnection{
 
         return _instance;
@@ -43,6 +53,8 @@ public class DesktopConnection extends EventDispatcher{
 
         _messageHandlers = new Dictionary();
 
+        _logger = LoggerFactory.getLogger(getQualifiedClassName(DesktopConnection));
+        
         createWebSocketConnection(host, port);
     }
 
@@ -66,7 +78,7 @@ public class DesktopConnection extends EventDispatcher{
 
     private function onOpen(event: WebSocketEvent): void{
 
-        trace("connection opened...");
+        _logger.debug("connection opened...");
         sendPreAuthorization();
     }
 
@@ -101,7 +113,7 @@ public class DesktopConnection extends EventDispatcher{
 
     private function onMessage(event: WebSocketEvent): void{
 
-        trace("RECIEVED: ", event.message.utf8Data);
+        _logger.debug("RECIEVED: ", event.message.utf8Data);
         var response: Object = JSON.parse(event.message.utf8Data);
 
         switch(_state){
@@ -187,7 +199,7 @@ public class DesktopConnection extends EventDispatcher{
         var message: String = JSON.stringify(json, _jsonFilter);
         _webSocket.sendUTF(message);
 
-        trace("SENT: ", message);
+        _logger.debug("SENT: ", message);
         return _messageId++;
     }
 
@@ -204,18 +216,18 @@ public class DesktopConnection extends EventDispatcher{
     }
 
     private function onClose(event: WebSocketEvent) {
-        trace(event.toString());
+        _logger.debug(event.toString());
         if (_onClose) _onClose(event.type);
     }
 
     private function onConnectionFail(event: WebSocketErrorEvent): void{
-        trace(event.text);
+        _logger.debug(event.text);
         if(_onError) _onError(event.errorID + ", " + event.text);
     }
 
     private function onAbnormalConnection(event: WebSocketErrorEvent): void{
 
-        trace(event.text);
+        _logger.debug(event.text);
         if(_onError) _onError(event.errorID + ", " + event.text);
     }
 

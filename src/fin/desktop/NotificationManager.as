@@ -5,17 +5,24 @@ package fin.desktop {
 import fin.desktop.connection.DesktopConnection;
 import fin.desktop.connection.DesktopConnectionEvent;
 import fin.desktop.events.NotificationEvent;
+import fin.desktop.logging.ILogger;
+import fin.desktop.logging.LoggerFactory;
+
+import flash.utils.getQualifiedClassName;
 
 internal class NotificationManager {
 
     private static var _instance: NotificationManager;
     private var _connection: DesktopConnection;
-
+    private var _logger: ILogger;
+    
     public function NotificationManager() {
 
         _connection = DesktopConnection.getInstance();
         _connection.addEventListener(DesktopConnectionEvent.PROCESS_NOTIFICATION_EVENT, onNotificationEvent);
         _instance = this;
+
+        _logger = LoggerFactory.getLogger(getQualifiedClassName(NotificationManager));
     }
 
     public static function initialise(): void{
@@ -39,7 +46,7 @@ internal class NotificationManager {
 
         if(payload.type === NotificationEvent.CLOSED || payload.type === NotificationEvent.DISMISSED){
 
-            trace("clearing notification", payload.payload.notificationId);
+            _logger.debug("clearing notification", payload.payload.notificationId);
             Notification.getInstances()[payload.payload.notificationId] = null;
         }
     }

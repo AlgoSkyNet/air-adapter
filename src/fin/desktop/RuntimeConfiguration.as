@@ -2,15 +2,24 @@
  * Created by richard on 5/27/2017.
  */
 package fin.desktop {
+import fin.desktop.logging.LoggerFactory;
+
+/**
+ * Configuration for launching OpenFin Runtime
+ */
 public class RuntimeConfiguration {
     private var _connectionUuid: String;
     private var _appManifestUrl: String;
-    private var _connectionTimeout = 10000;
-    private var _runtimeWorkPath: String;
+    private var _connectionTimeout:Number = 10000;
+    private var _runtimeInstallPath: String;
     private var _onConnectionReady: Function;
     private var _onConnectionClose: Function;
     private var _onConnectionError: Function;
 
+    /**
+     * Constructor
+     * @param uuid uuid of the connection to Runtime
+     */
     public function RuntimeConfiguration(uuid: String) {
         this._connectionUuid = uuid;
     }
@@ -19,52 +28,112 @@ public class RuntimeConfiguration {
         return _connectionUuid;
     }
 
+    /**
+     * Get URL of app manifest
+     */
     public function get appManifestUrl():String {
         return _appManifestUrl;
     }
 
+    /**
+     * Set URL of app manifest
+     * @param value URL of app manifest
+     */
     public function set appManifestUrl(value:String):void {
         _appManifestUrl = value;
     }
-    
-    public function get runtimeWorkPath():String {
-        return _runtimeWorkPath;
+
+    /**
+     * Get path of Runtime install location
+     */
+    public function get runtimeInstallPath():String {
+        return _runtimeInstallPath;
     }
 
-    public function set runtimeWorkPath(value:String):void {
-        _runtimeWorkPath = value;
+    /**
+     * Set path of Runtime install location.  Default: %LocalAppData%/OpenFin
+     * @param value path of install location
+     */
+    public function set runtimeInstallPath(value:String):void {
+        _runtimeInstallPath = value;
     }
 
-    public function get connectionTimeout():* {
+    /**
+     * Get timeout in milli-seconds
+     */
+    public function get connectionTimeout():Number {
         return _connectionTimeout;
     }
 
-    public function set connectionTimeout(value):void {
+    /**
+     * Set timeout in milli-seconds
+     *
+     * @param value timeout in milli-seconds
+     */
+    public function set connectionTimeout(value:Number):void {
         _connectionTimeout = value;
     }
 
+    /**
+     * Get callback function for connection ready event
+     */
     public function get onConnectionReady():Function {
         return _onConnectionReady;
     }
 
+    /**
+     * Set callback function for connection ready event
+     * @param value callback function
+     */
     public function set onConnectionReady(value:Function):void {
         _onConnectionReady = value;
     }
 
+    /**
+     * Get callback function for connection error event
+      */
     public function get onConnectionError():Function {
         return _onConnectionError;
     }
 
+    /**
+     * Set callback function for connection error event
+     * @param value callback function
+     */
     public function set onConnectionError(value:Function):void {
         _onConnectionError = value;
     }
-    
+
+    /**
+     * Get callback function for connection close event
+     */
     public function get onConnectionClose():Function {
         return _onConnectionClose;
     }
 
+    /**
+     * Set callback function for connection close event
+     * @param value callback function
+     */
     public function set onConnectionClose(value:Function):void {
         _onConnectionClose = value;
     }
+
+    /**
+     * Enable logging to a log file
+     * @param logFilename name of the log file in %LocalAppData%/OpenFin/logs
+     */
+    public static function enableFileLogging(logFilename:String=null):void {
+        LoggerFactory.addFileLogger(logFilename);
+    }
+
+    /**
+     * Enable logging with trace(...)
+     */
+    public static function enableTraceLogging():void {
+        LoggerFactory.addTraceLogger();
+    }
+
+
 }
 }

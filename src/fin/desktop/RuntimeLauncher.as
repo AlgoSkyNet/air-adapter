@@ -2,20 +2,21 @@
  * Created by haseebriaz on 02/02/2015.
  */
 package fin.desktop {
+
 import fin.desktop.connection.DesktopConnection;
 
 import com.openfin.OpenfinNativeExtention;
 
-import flash.desktop.NativeProcess;
-import flash.events.Event;
-import flash.events.ProgressEvent;
+import fin.desktop.logging.ILogger;
+
+import fin.desktop.logging.LoggerFactory;
+
 import flash.events.StatusEvent;
 import flash.filesystem.File;
 import flash.filesystem.FileMode;
 import flash.filesystem.FileStream;
-import flash.net.URLLoader;
-import flash.net.URLRequest;
-import flash.utils.ByteArray;
+import flash.utils.getQualifiedClassName;
+
 import mx.utils.UIDUtil;
 
 public class RuntimeLauncher {
@@ -27,16 +28,17 @@ public class RuntimeLauncher {
     private var securityRealm: String;  // from app manifest
     private var desktopConnection: DesktopConnection;
     private var runtimeConfiguration: RuntimeConfiguration;
+    private var logger:ILogger;
 
     private static var SECURITY_REALM_SETTING: String = "--security-realm="; // from runtime->arguments
 
     private static var DEFAULT_RUNTIME_WORK_PATH   : String = "AppData\\Local\\OpenFin";
-    private static var DEFAULT_INSTALLER_WORK_PATH : String = "AppData\\Local\\OpenFin";
 
     [Embed(source="/assets/OpenFinInstaller.exe", mimeType="application/octet-stream")]
     var myAsset: Class;
     
     public function RuntimeLauncher(runtimeConfiguration: RuntimeConfiguration) {
+        logger = LoggerFactory.getLogger(getQualifiedClassName(RuntimeLauncher));
         this.runtimeConfiguration = runtimeConfiguration;
         this.ane = new OpenfinNativeExtention();
         getAppManifest();
@@ -44,60 +46,60 @@ public class RuntimeLauncher {
 
     private function initialiseProcess(): void{
         var namedPipeName:String = "OpenfinDesktop." + UIDUtil.createUID();
-        trace("calling discoverRuntime " + namedPipeName);
+        logger.debug("calling discoverRuntime ", namedPipeName);
         ane.addEventListener(StatusEvent.STATUS, onStatusEvent);
         var workPath: String;
         var workExec: String;
         var workDir: File;
-        if (runtimeConfiguration.runtimeWorkPath != null) {
-            workDir = new File(runtimeConfiguration.runtimeWorkPath);
+        if (runtimeConfiguration.runtimeInstallPath != null) {
+            workDir = new File(runtimeConfiguration.runtimeInstallPath);
         } else {
             workDir = File.userDirectory.resolvePath(DEFAULT_RUNTIME_WORK_PATH);
         }
         var runtimeFile: File = workDir.resolvePath(runtimeExec);
         if (!runtimeFile.exists) {
-            trace(runtimeFile.nativePath, "desc not exist.  Unpacking", installerExec);
+            logger.debug(runtimeFile.nativePath, "desc not exist.  Unpacking", installerExec);
             workExec = installerExec;
             workPath = unpackInstaller();
         } else {
-            trace(runtimeFile.nativePath, "exists");
+            logger.debug(runtimeFile.nativePath, "exists");
             workExec = runtimeExec;
             workPath = workDir.nativePath;
         }
         var args: String = "--config=" + this.runtimeConfiguration.appManifestUrl +
                             ' --runtime-arguments=--runtime-information-channel-v6=' + namedPipeName;
-        trace("invoking ", workPath, workExec, args);
+        logger.debug("invoking ", workPath, workExec, args);
         ane.launchRuntime(workPath, workExec, args, "chrome." + namedPipeName, runtimeConfiguration.connectionTimeout);
     }
 
     private function unpackInstaller(): String {
         var installer:ByteArray = new myAsset() as ByteArray;
-        trace("installer length", installer.length);
+        logger.debug("installer length", installer.length);
         var temp:File = File.createTempDirectory();
-        trace(temp.nativePath);
+        logger.debug(temp.nativePath);
         var fs : FileStream = new FileStream();
         var targetFile : File = temp.resolvePath(installerExec);
         fs.open(targetFile, FileMode.WRITE);
         fs.writeBytes(installer,0,installer.length);
         fs.close();
-        trace("unpacked ", installerExec, " to ", targetFile.nativePath);
+        logger.debug("unpacked ", installerExec, " to ", targetFile.nativePath);
         return temp.nativePath;
     }
 
     private function onStatusEvent(event:StatusEvent): void {
-        trace("received status message:", event.code);
-        trace("received status message:", event.level);
+        logger.debug("received status message:", event.code);
+        logger.debug("received status message:", event.level);
         if (event.code == "PortDiscoverySuccessMessage") {
             // {"action":"runtime-information","payload":{"version":"7.53.20.20","sslPort":-1,"port":9696,"requestedVersion":"beta","securityRealm":"nucleus","runtimeInformationChannel":"OpenfinDesktop.81309855-23E6-E90F-B8B5-7E862895AB5A"}}
             var data: Object = JSON.parse(event.level);
             if (matchRuntimeInstance(data.payload.requestedVersion, data.payload.securityRealm)) {
                 this.port = data.payload.port;
-                trace("Found matching Runtime", data.payload.version, "at port", this.port);
+                logger.debug("Found matching Runtime", data.payload.version, "at port", this.port);
                 desktopConnection = new DesktopConnection(runtimeConfiguration.connectionUuid, "localhost", port,
                         runtimeConfiguration.onConnectionReady, runtimeConfiguration.onConnectionError,
                         runtimeConfiguration.onConnectionClose);
             } else {
-                trace("Ignoring PortDiscoverySuccessMessage");
+                logger.debug("Ignoring PortDiscoverySuccessMessage");
             }
         }
         if (event.code == "PortDiscoveryErrorMessage") {
@@ -131,11 +133,11 @@ private function onOutputData(event: ProgressEvent): void{
         process.standardOutput.readBytes(bytes);
         process.closeInput();
 //        process.exit(false);
-        trace(bytes.toString());
+        logger.debug(bytes.toString());
     }
 
     private function getAppManifest(): void {
-        trace("retrieving", this.runtimeConfiguration.appManifestUrl);
+        logger.debug("retrieving", this.runtimeConfiguration.appManifestUrl);
         var urlLoader: URLLoader = new URLLoader();
         urlLoader.addEventListener(Event.COMPLETE, this._onJSONLoaded);
         urlLoader.load(new URLRequest(this.runtimeConfiguration.appManifestUrl));
@@ -151,11 +153,11 @@ private function onOutputData(event: ProgressEvent): void{
                 var setting: String = results[i];
                 if (setting.indexOf(SECURITY_REALM_SETTING) == 0) {
                     this.securityRealm = setting.substr(SECURITY_REALM_SETTING.length);
-                    trace("runtime security realm from manifest", this.securityRealm);
+                    logger.debug("runtime security realm from manifest", this.securityRealm);
                 }
             }
         }
-        trace("runtime version from manifest", runtimeVersion);
+        logger.debug("runtime version from manifest", runtimeVersion);
         initialiseProcess();
     }
 

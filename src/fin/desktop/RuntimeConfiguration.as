@@ -12,6 +12,7 @@ public class RuntimeConfiguration {
     private var _appManifestUrl: String;
     private var _connectionTimeout:Number = 10000;
     private var _runtimeInstallPath: String;
+    private var _assetUrl: String;
     private var _onConnectionReady: Function;
     private var _onConnectionClose: Function;
     private var _onConnectionError: Function;
@@ -72,6 +73,22 @@ public class RuntimeConfiguration {
      */
     public function set connectionTimeout(value:Number):void {
         _connectionTimeout = value;
+    }
+
+
+    /**
+     * Get Runtime asset URL
+     */
+    public function get assetUrl():String {
+        return _assetUrl;
+    }
+
+    /**
+     * Set Runtime asset URL
+     * @param value URL of Runtime assets
+     */
+    public function set assetUrl(value:String):void {
+        _assetUrl = value;
     }
 
     /**

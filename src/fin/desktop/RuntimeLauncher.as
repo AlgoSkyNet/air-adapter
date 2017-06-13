@@ -57,17 +57,24 @@ public class RuntimeLauncher {
             workDir = File.userDirectory.resolvePath(DEFAULT_RUNTIME_WORK_PATH);
         }
         var runtimeFile: File = workDir.resolvePath(runtimeExec);
+        var installerArgs: String = " ";  // additional args only needed for Installer
         if (!runtimeFile.exists) {
             logger.debug(runtimeFile.nativePath, "desc not exist.  Unpacking", installerExec);
             workExec = installerExec;
             workPath = unpackInstaller();
+            if (runtimeConfiguration.assetUrl != null) {
+                installerArgs += " --assetsUrl=" + runtimeConfiguration.assetUrl;
+            }
+            if (runtimeConfiguration.runtimeInstallPath != null) {
+                installerArgs += "/D=" + runtimeConfiguration.runtimeInstallPath;
+            }
         } else {
             logger.debug(runtimeFile.nativePath, "exists");
             workExec = runtimeExec;
             workPath = workDir.nativePath;
         }
         var args: String = "--config=" + this.runtimeConfiguration.appManifestUrl +
-                            ' --runtime-arguments=--runtime-information-channel-v6=' + namedPipeName;
+                            ' --runtime-arguments=--runtime-information-channel-v6=' + namedPipeName + installerArgs;
         logger.debug("invoking ", workPath, workExec, args);
         ane.launchRuntime(workPath, workExec, args, "chrome." + namedPipeName, runtimeConfiguration.connectionTimeout);
     }

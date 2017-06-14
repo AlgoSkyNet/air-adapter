@@ -6,6 +6,10 @@ import fin.desktop.connection.DesktopConnection;
 import fin.desktop.connection.DesktopConnectionEvent;
 import fin.desktop.connection.ResponseWaiter;
 import fin.desktop.events.EventManager;
+import fin.desktop.logging.ILogger;
+import fin.desktop.logging.LoggerFactory;
+
+import flash.utils.getQualifiedClassName;
 
 /**
  * @class System
@@ -15,23 +19,36 @@ public class System {
     private var _eventManager: EventManager;
     private var _connection: DesktopConnection;
     private static var _instance: System;
+    private var _logger:ILogger;
 
     /**
      * Gets and instance of the System
      */
     public static function getInstance(): System{
-
-        return _instance? _instance: _instance = new System();
+        if (_instance) {
+            if (!_instance._connection.valid) {
+                _instance.initConnection();
+            }
+        } else {
+            _instance = new System();
+        }
+        return _instance;
     }
 
     public function System() {
 
         if(_instance) throw new Error("Only one instance of System is allowed");
 
+        _logger = LoggerFactory.getLogger(getQualifiedClassName(System));
         _eventManager = new EventManager();
+        initConnection();
+        _instance = this;
+    }
+
+    private function initConnection():void {
+        _logger.debug("initConnection");
         _connection = DesktopConnection.getInstance();
         _connection.addEventListener(DesktopConnectionEvent.PROCESS_DESKTOP_EVENT, processDesktopEvent);
-        _instance = this;
     }
 
     private function processDesktopEvent(event: DesktopConnectionEvent): void{

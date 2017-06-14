@@ -5,6 +5,10 @@ package fin.desktop {
 import fin.desktop.connection.DesktopConnection;
 import fin.desktop.connection.DesktopConnectionEvent;
 import fin.desktop.events.EventManager;
+import fin.desktop.logging.ILogger;
+import fin.desktop.logging.LoggerFactory;
+
+import flash.utils.getQualifiedClassName;
 
 public class InterApplicationBus {
 
@@ -12,24 +16,37 @@ public class InterApplicationBus {
 
     private var _connection: DesktopConnection;
     private var _eventManager: EventManager;
+    private var _logger:ILogger;
 
     public function InterApplicationBus() {
 
         if(_instance) throw new Error("Only one instance is allowed.");
 
-        _connection = DesktopConnection.getInstance();
-        _connection.addEventListener(DesktopConnectionEvent.PROCESS_BUS_MESSAGE, onBusMessage);
-        _connection.addEventListener(DesktopConnectionEvent.SUBSCRIBER_ADDED, onSubscriberAdded);
-        _connection.addEventListener(DesktopConnectionEvent.SUBSCRIBER_REMOVED, onSubscriberRemoved);
-
+        _logger = LoggerFactory.getLogger(getQualifiedClassName(InterApplicationBus));
+        initConnection();
         _eventManager = new EventManager();
 
         _instance = this;
     }
 
     public static function getInstance(): InterApplicationBus {
+        if (_instance) {
+            if (!_instance._connection.valid) {
+                _instance.initConnection();
+            }
+        } else {
+            _instance = new InterApplicationBus();
+        }
 
-        return _instance? _instance : _instance = new InterApplicationBus();
+        return _instance;
+    }
+
+    private function initConnection(): void {
+        _logger.debug("initConnection");
+        _connection = DesktopConnection.getInstance();
+        _connection.addEventListener(DesktopConnectionEvent.PROCESS_BUS_MESSAGE, onBusMessage);
+        _connection.addEventListener(DesktopConnectionEvent.SUBSCRIBER_ADDED, onSubscriberAdded);
+        _connection.addEventListener(DesktopConnectionEvent.SUBSCRIBER_REMOVED, onSubscriberRemoved);
     }
 
     private function onBusMessage(event: DesktopConnectionEvent): void{

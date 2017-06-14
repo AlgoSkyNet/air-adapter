@@ -36,14 +36,33 @@ public class DesktopConnection extends EventDispatcher{
     private var _onClose: Function;
     private var _messageHandlers:Dictionary;
     private var _logger:ILogger;
+    private var _valid:Boolean;
     
     public static function getInstance(): DesktopConnection{
-
         return _instance;
     }
     public function DesktopConnection(uuid: String, host: String, port: String, onReady: Function, onError: Function = null, onClose = null) {
 
-        if(_instance) throw new Error("Only one instance of Desktop Connection is allowed, use DesktopConnection.getInstance()");
+        if(_instance) {
+            if (_instance._webSocket && _instance._webSocket.connected) {
+                _instance._logger.debug("DesktopConnection is already connected");
+                throw new Error("Only one instance of Desktop Connection is allowed, use DesktopConnection.getInstance()");
+            } else if (_instance._webSocket) {
+                _instance._logger.debug("reset stable connection");
+                _instance._valid = false;
+                _instance._webSocket.removeEventListener(WebSocketEvent.OPEN, onOpen);
+                _instance._webSocket.removeEventListener(WebSocketEvent.MESSAGE, onMessage);
+                _instance._webSocket.removeEventListener(WebSocketEvent.CLOSED, onClose);
+                _instance._webSocket.removeEventListener(WebSocketErrorEvent.CONNECTION_FAIL, onConnectionFail);
+                _instance._webSocket.removeEventListener(WebSocketErrorEvent.ABNORMAL_CLOSE, onAbnormalConnection);
+                _instance._webSocket.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
+
+                _instance._webSocket = null;
+                _instance = null;
+            }
+        }
+
+        _logger = LoggerFactory.getLogger(getQualifiedClassName(DesktopConnection));
 
         _instance = this;
         _uuid = uuid;
@@ -53,8 +72,6 @@ public class DesktopConnection extends EventDispatcher{
 
         _messageHandlers = new Dictionary();
 
-        _logger = LoggerFactory.getLogger(getQualifiedClassName(DesktopConnection));
-        
         createWebSocketConnection(host, port);
     }
 
@@ -74,6 +91,7 @@ public class DesktopConnection extends EventDispatcher{
 
             if(_onError) _onError(error.message);
         }
+        _valid = true;
     }
 
     private function onOpen(event: WebSocketEvent): void{
@@ -216,24 +234,27 @@ public class DesktopConnection extends EventDispatcher{
     }
 
     private function onClose(event: WebSocketEvent) {
-        _logger.debug(event.toString());
+        _logger.debug("onClose", event.toString());
         if (_onClose) _onClose(event.type);
     }
 
     private function onConnectionFail(event: WebSocketErrorEvent): void{
-        _logger.debug(event.text);
+        _logger.debug("onConnectionFail", event.text);
         if(_onError) _onError(event.errorID + ", " + event.text);
     }
 
     private function onAbnormalConnection(event: WebSocketErrorEvent): void{
-
-        _logger.debug(event.text);
+        _logger.debug("onAbnormalConnection", event.text);
         if(_onError) _onError(event.errorID + ", " + event.text);
     }
 
     private function onIOError(event: IOErrorEvent): void{
-
+        _logger.debug("onIOError", event.errorID, event.text);
         if(_onError) _onError(event.errorID + ", " + event.text);
+    }
+    
+    public function get valid():Boolean {
+        return _valid;
     }
 }
 }

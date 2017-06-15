@@ -316,6 +316,16 @@ public class Window extends DesktopEventManager{
         sendMessage("set-window-bounds", createPayload({left: left, top: top, width:width, height:height}), callback, errorCallback);
     }
 
+    /**
+     * Gets HWND of the current window
+     *
+     * @param callback A function that is called if the method succeeds.
+     * @param errorCallback A function that is called when method fails.
+     */
+    public function  getNativeId(callback: Function = null, errorCallback: Function = null): void {
+
+        sendMessage("get-window-native-id", createPayload({uuid: _uuid, name: _name}), callback, errorCallback);
+    }
 
 
 }

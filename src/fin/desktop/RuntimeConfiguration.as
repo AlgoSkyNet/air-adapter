@@ -2,7 +2,10 @@
  * Created by richard on 5/27/2017.
  */
 package fin.desktop {
+import fin.desktop.logging.ILogger;
 import fin.desktop.logging.LoggerFactory;
+
+import flash.utils.getQualifiedClassName;
 
 /**
  * Configuration for launching OpenFin Runtime
@@ -16,6 +19,7 @@ public class RuntimeConfiguration {
     private var _onConnectionReady: Function;
     private var _onConnectionClose: Function;
     private var _onConnectionError: Function;
+    private var logger:ILogger;
 
     /**
      * Constructor
@@ -23,6 +27,8 @@ public class RuntimeConfiguration {
      */
     public function RuntimeConfiguration(uuid: String) {
         this._connectionUuid = uuid;
+        logger = LoggerFactory.getLogger(getQualifiedClassName(RuntimeLauncher));
+        logger.debug("created with uuid ", uuid);
     }
     
     public function get connectionUuid():String {
@@ -151,6 +157,9 @@ public class RuntimeConfiguration {
         LoggerFactory.addTraceLogger();
     }
 
+    public static function enableConsoleLogging():void {
+        LoggerFactory.addConsoleLogger();
+    }
 
 }
 }

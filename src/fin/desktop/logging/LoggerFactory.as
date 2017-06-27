@@ -67,5 +67,11 @@ public class LoggerFactory {
         addTarget(target);
     }
 
+    public static function addConsoleLogger(level:Number=LogEvent.DEBUG):void {
+        var target: ConsoleTarget = new ConsoleTarget();
+        target.level = level;
+        addTarget(target);
+    }
+
 }
 }

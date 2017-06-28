@@ -9,6 +9,7 @@ import fin.desktop.logging.ILogger;
 import fin.desktop.logging.LoggerFactory;
 
 import flash.display.NativeWindow;
+import flash.events.Event;
 import flash.utils.getQualifiedClassName;
 
 public class CapturingWindow {
@@ -16,7 +17,8 @@ public class CapturingWindow {
     private var _nativeWindow: NativeWindow;
     private var _callBack: Function;
     private var _errorCallback: Function;
-    private var hwnd: String;
+    private var _hwnd: String;
+    private var _parentHWND: String;
     private var _appOptopns : ApplicationOptions;
     private var _windowOptopns : WindowOptions;
     private var _captureOptions: CaptureOptions;
@@ -25,7 +27,8 @@ public class CapturingWindow {
 
     public function CapturingWindow(nativeWindow: NativeWindow, callback: Function = null, errorCallback: Function = null) {
         this.ane = new OpenfinNativeExtention();
-        this.hwnd = ane.getHWND();
+        this._hwnd = ane.getHWND();
+        this._nativeWindow = nativeWindow;
         this._callBack = callback;
         this._errorCallback = errorCallback;
         logger = LoggerFactory.getLogger(getQualifiedClassName(CapturingWindow));
@@ -55,15 +58,19 @@ public class CapturingWindow {
         var w:Window = new Window(this._appOptopns.uuid, this._appOptopns.uuid);
         w.getNativeId(function (data:String) {
             trace(data);
-            var parentHWND = data;
-            var childHWND = hwnd;
-            logger.debug("sending capturing request for", childHWND, " to ", parentHWND)
-            ane.captureAirWindow(parentHWND, childHWND, _captureOptions.borderTop,
+            _parentHWND = data;
+            logger.debug("sending capturing request for", _hwnd, " to ", _parentHWND)
+            ane.captureAirWindow(_parentHWND, _hwnd, _captureOptions.borderTop,
                     _captureOptions.borderRight, _captureOptions.borderBottom, _captureOptions.borderLeft);
         });
 
+        w.addEventListener("bounds-changing", onParentAppBoundsChanging);
     }
 
+    private function onParentAppBoundsChanging(event: Event): void {
+        logger.debug("updating bounds", event.type, _parentHWND, _hwnd);
+        ane.updateCaptureWindowBounds(_parentHWND, _hwnd);
+    }
 
 }
 }

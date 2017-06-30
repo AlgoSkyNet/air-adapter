@@ -37,6 +37,7 @@ public class WindowOptions {
     public var minimizable: Boolean = true;
     public var maxHeight: Number;
     public var maximizable: Boolean = true;
+    public var saveWindowState: Boolean = true;
 
     public function WindowOptions(uuid: String = null, name: String = null) {
 

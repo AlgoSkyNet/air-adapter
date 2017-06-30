@@ -57,7 +57,7 @@ public class Window extends DesktopEventManager{
     public static function registerExternalWindow(uuid: String, name: String, callback: Function = null, errorCallback: Function = null): Window{
 
         if(!ane)ane = new OpenfinNativeExtention();
-        sendMessage("register-external-window", {topic: "application", hwnd: ane.getHWND() , uuid:uuid, name: name}, callback, errorCallback);
+//        sendMessage("register-external-window", {topic: "application", hwnd: ane.getHWND() , uuid:uuid, name: name}, callback, errorCallback);
         return new Window(uuid, name);
     }
 

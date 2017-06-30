@@ -55,7 +55,7 @@ public class ExternalWindow extends Window{
         this.callBack = callback;
         _nativeWindow = nativeWindow;
         if(!ane)ane = new OpenfinNativeExtention();
-        hwnd = ane.getHWND();
+        hwnd = ane.getHWND(nativeWindow.title, nativeWindow.title);
         sendMessage("register-external-window", {topic: "application", hwnd: hwnd , uuid:uuid, name: name}, onRegister, errorCallback);
         addEventListener(WindowEvent.FRAME_DISABLED, this._onFrameDisabled);
         addEventListener(WindowEvent.FRAME_ENABLED, this._onFrameEnabled);

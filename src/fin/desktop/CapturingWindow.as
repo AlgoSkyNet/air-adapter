@@ -65,6 +65,7 @@ public class CapturingWindow {
         logger.info("onParentAppStarted", _appOptopns.uuid);
         _parentWindow.addEventListener("bounds-changing", onParentAppBoundsChanging);
         _parentWindow.addEventListener("shown", onParentAppShown);
+        _parentWindow.addEventListener("focused", onParentAppFocused);
         _parentWindow.getNativeId(function (data:String) {
             trace(data);
             _parentHWND = data;
@@ -99,9 +100,15 @@ public class CapturingWindow {
         if (_parentHWND) {
             logger.debug("updating bounds on shown", event.type, _parentHWND, _hwnd);
             ane.updateCaptureWindowBounds(_parentHWND, _hwnd, "onParentAppShown " + _parentHWND);
+            // the following 2 moveBy trigger bounds-changing events so updateCaptureWindowBounds is called to adjust bounds of Ahr window to fit OpenFin window
             _parentWindow.moveBy(1,0);
             _parentWindow.moveBy(-1,0);
         }
+    }
+
+    private function onParentAppFocused(event: WindowEvent): void {
+        logger.debug("activate on focus", event.type, _parentHWND, _hwnd);
+        ane.updateCaptureWindowFocus(_parentHWND, _hwnd);
     }
 
 }

@@ -22,15 +22,11 @@ public class ApplicationTest {
         windowOptions.showTaskbarIcon = true;
         windowOptions.frame = true;
 
-        var app: Application = new Application(applicationOptions, function(value){
+        var app: Application = new Application(applicationOptions, function(value): void{
             trace("app created");
             showWindow(app);
             app.run();
-        }, function(reason: String){
-
-
-
-
+        }, function(reason: String): void{
             showWindow(app);
         });
     }
@@ -40,10 +36,10 @@ public class ApplicationTest {
         trace("application started", event.target);
         var app: Application = event.application;
         app.window.show();
-        app.getGroups(function(groups){
+        app.getGroups(function(groups): void {
 
         });
-        app.addEventListener(ApplicationEvent.TRAY_ICON_CLICKED, function(event: ApplicationEvent){
+        app.addEventListener(ApplicationEvent.TRAY_ICON_CLICKED, function(event: ApplicationEvent): void {
 
             trace("icon was clicked", event.payload.x, event.payload.y);
             event.application.removeTrayIcon();
@@ -54,7 +50,7 @@ public class ApplicationTest {
 
         trace("window");
         app.addEventListener(ApplicationEvent.STARTED, onAppStarted);
-        app.addEventListener(ApplicationEvent.CLOSED, function(event: ApplicationEvent){
+        app.addEventListener(ApplicationEvent.CLOSED, function(event: ApplicationEvent): void {
 
             trace("application closed");
         });

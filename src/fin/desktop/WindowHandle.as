@@ -21,7 +21,7 @@ public class WindowHandle {
 
     }
 
-    public static function onBusMessage(message: *, uuid: String){
+    public static function onBusMessage(message: *, uuid: String): void {
 
         var name: String = message.windowName;
         switch(message.action){
@@ -52,7 +52,7 @@ public class WindowHandle {
         init();
     }
 
-    public function onMoving(event: NativeWindowBoundsEvent){
+    public function onMoving(event: NativeWindowBoundsEvent): void {
 
         event.stopPropagation();
         event.preventDefault();

@@ -35,7 +35,7 @@ public class RuntimeLauncher {
     private static var DEFAULT_RUNTIME_WORK_PATH   : String = "AppData\\Local\\OpenFin";
 
     [Embed(source="/assets/OpenFinInstaller.exe", mimeType="application/octet-stream")]
-    var myAsset: Class;
+    private var myAsset: Class;
     
     public function RuntimeLauncher(runtimeConfiguration: RuntimeConfiguration) {
         logger = LoggerFactory.getLogger(getQualifiedClassName(RuntimeLauncher));

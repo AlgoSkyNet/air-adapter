@@ -53,7 +53,7 @@ public class Notification extends EventDispatcher{
         _instances[options.notificationId] = this;
     }
 
-    private static function sendMessageToNotificationCenter(action: String, payload: Object, callback: Function = null, errorCallback: Function = null){
+    private static function sendMessageToNotificationCenter(action: String, payload: Object, callback: Function = null, errorCallback: Function = null): void {
 
         DesktopConnection.getInstance().sendMessage("send-action-to-notifications-center",{action: action, payload: payload}, callback, errorCallback);
     }

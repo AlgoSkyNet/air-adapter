@@ -41,7 +41,7 @@ public class CapturingWindow {
         this._captureOptions = captureOptions;
         this._callBack = callback;
         this._errorCallback = errorCallback;
-        this._parentApp = new Application(applicationOptions, onParentAppCreated, function (err:*) {
+        this._parentApp = new Application(applicationOptions, onParentAppCreated, function (err:*): void {
             logger.info("Error creating capturing app", applicationOptions.uuid);
             if (_errorCallback) {
                 _errorCallback.apply(this, err);
@@ -52,7 +52,7 @@ public class CapturingWindow {
     private function onParentAppCreated(): void {
         logger.info("onParentAppCreated", _appOptopns.uuid);
         _parentWindow = new Window(this._appOptopns.uuid, this._appOptopns.uuid);
-        _parentApp.run(onParentAppStarted, function (err:*) {
+        _parentApp.run(onParentAppStarted, function (err:*): void  {
             logger.info("Error starting capturing app", _appOptopns.uuid);
             if (_errorCallback) {
                 _errorCallback.apply(this, err);
@@ -65,7 +65,7 @@ public class CapturingWindow {
         _parentWindow.addEventListener("bounds-changing", onParentAppBoundsChanging);
         _parentWindow.addEventListener("shown", onParentAppShown);
         _parentWindow.addEventListener("focused", onParentAppFocused);
-        _parentWindow.getNativeId(function (data:String) {
+        _parentWindow.getNativeId(function (data:String): void {
             trace(data);
             _parentHWND = data;
             logger.debug("sending capturing request for", _hwnd, " to ", _parentHWND);
@@ -76,18 +76,8 @@ public class CapturingWindow {
                 _callBack.apply(this, args);
             }
 
-            _parentWindow.getBounds(onParentAppInitBounds);
-//            _parentWindow.show();
         });
 
-    }
-
-    private function onParentAppInitBounds(bounds: Object): void {
-        logger.debug("updating init bounds", JSON.stringify(bounds), _appOptopns.uuid, _parentHWND, _hwnd);
-        _parentWindow.moveBy(1,0);
-        _parentWindow.moveBy(-1,0);
-//        var notes: String = "updating init bounds " + _parentHWND + " bounds " + bounds.width + ":" + bounds.height;
-//        ane.updateCaptureWindowBounds(_parentHWND, _hwnd, notes, bounds.width, bounds.height);
     }
 
     private function onParentAppBoundsChanging(event: WindowEvent): void {
@@ -100,8 +90,8 @@ public class CapturingWindow {
             logger.debug("updating bounds on shown", event.type, _parentHWND, _hwnd);
             ane.updateCaptureWindowBounds(_parentHWND, _hwnd);
             // the following 2 moveBy trigger bounds-changing events so updateCaptureWindowBounds is called to adjust bounds of Ahr window to fit OpenFin window
-            _parentWindow.moveBy(1,0);
-            _parentWindow.moveBy(-1,0);
+//            _parentWindow.moveBy(1,0);
+//           _parentWindow.moveBy(-1,0);
         }
     }
 

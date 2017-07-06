@@ -85,7 +85,7 @@ public class InterApplicationBus {
             return;
         }
 
-        var onResponse: Function = function(){
+        var onResponse: Function = function(): void {
 
             _eventManager.addEventListener(eventType, listener);
             if(callback)callback();

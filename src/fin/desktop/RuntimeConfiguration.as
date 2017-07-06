@@ -168,16 +168,13 @@ public class RuntimeConfiguration {
     /**
      * Enable logging from native extension
      *
-     * If consoleWindow is true, logFilePath is being ignored
-     *
      * @param logFilePath  path to log file
-     * @param consoleWindow true to write logs to parent process's console.  Useful when running in IDE
      */
-    public static function enableNativeExtensionLogging(logFilePath: String, consoleWindow: Boolean): void {
+    public static function enableNativeExtensionLogging(logFilePath: String): void {
         if (!ane) {
             ane = new OpenfinNativeExtention();
         }
-        ane.enableLogging(logFilePath, consoleWindow);
+        ane.enableLogging(logFilePath, false);
     }
 
 }

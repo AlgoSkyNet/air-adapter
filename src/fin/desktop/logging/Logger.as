@@ -17,7 +17,7 @@ internal class Logger extends EventDispatcher implements ILogger {
     }
 
     public function log(level:Number, ...rest):void {
-        if(level == undefined || level < LogEvent.DEBUG){
+        if(level < LogEvent.DEBUG){
             throw new ArgumentError('Invalid logging LogEventLevel');
         }
         dispatchEvent(new LogEvent(LogEvent.LOG, this, level, { message: generateLogString.apply(this, rest) }));

@@ -29,7 +29,7 @@ public class WindowTests {
         windowOptions.frame = true;
         windowOptions.draggable = true;
         applicationOptions.mainWindowOptions = windowOptions;
-        app = new Application(applicationOptions, showApp, function(reason: String){
+        app = new Application(applicationOptions, showApp, function(reason: String): void {
             trace("could not create the application, reason:", reason);
         });
     }

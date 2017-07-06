@@ -12,7 +12,7 @@ public class NotificationTest {
         var notification2: Notification = new Notification(new NotificationOptions("http://demoappdirectory.openf.in/desktop/config/apps/OpenFin/HelloOpenFin/views/notification.html",
                 "test message2!", "30000"));
 
-        var notification2: Notification = new Notification(new NotificationOptions("http://demoappdirectory.openf.in/desktop/config/apps/OpenFin/HelloOpenFin/views/notification.html",
+        var notification3: Notification = new Notification(new NotificationOptions("http://demoappdirectory.openf.in/desktop/config/apps/OpenFin/HelloOpenFin/views/notification.html",
                 "test message3!", "30000"));
 
         var notification: Notification =  new Notification(new NotificationOptions("http://demoappdirectory.openf.in/desktop/config/apps/OpenFin/HelloOpenFin/views/notification.html",

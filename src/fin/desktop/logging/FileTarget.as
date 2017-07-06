@@ -21,7 +21,7 @@ internal class FileTarget extends AbstractTarget {
     }
 
     override protected function internalLog(message:String, level:Number):void{
-        if (fileStream != undefined) {
+        if (fileStream != null) {
             fileStream.writeMultiByte(message + "\n", File.systemCharset);
         }
     }

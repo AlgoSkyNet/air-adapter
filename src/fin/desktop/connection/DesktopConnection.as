@@ -233,7 +233,7 @@ public class DesktopConnection extends EventDispatcher{
         }
     }
 
-    private function onClose(event: WebSocketEvent) {
+    private function onClose(event: WebSocketEvent): void  {
         _logger.debug("onClose", event.toString());
         if (_onClose) _onClose(event.type);
     }

@@ -11,7 +11,6 @@ import fin.desktop.logging.ILogger;
 import fin.desktop.logging.LoggerFactory;
 
 import flash.display.NativeWindow;
-import flash.events.Event;
 import flash.utils.getQualifiedClassName;
 
 public class CapturingWindow {
@@ -93,13 +92,13 @@ public class CapturingWindow {
 
     private function onParentAppBoundsChanging(event: WindowEvent): void {
         logger.debug("updating bounds", event.type, _parentHWND, _hwnd);
-        ane.updateCaptureWindowBounds(_parentHWND, _hwnd, "onParentAppBoundsChanging " + _parentHWND);
+        ane.updateCaptureWindowBounds(_parentHWND, _hwnd);
     }
 
     private function onParentAppShown(event: WindowEvent): void {
         if (_parentHWND) {
             logger.debug("updating bounds on shown", event.type, _parentHWND, _hwnd);
-            ane.updateCaptureWindowBounds(_parentHWND, _hwnd, "onParentAppShown " + _parentHWND);
+            ane.updateCaptureWindowBounds(_parentHWND, _hwnd);
             // the following 2 moveBy trigger bounds-changing events so updateCaptureWindowBounds is called to adjust bounds of Ahr window to fit OpenFin window
             _parentWindow.moveBy(1,0);
             _parentWindow.moveBy(-1,0);

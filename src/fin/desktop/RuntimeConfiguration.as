@@ -2,6 +2,8 @@
  * Created by richard on 5/27/2017.
  */
 package fin.desktop {
+import com.openfin.OpenfinNativeExtention;
+
 import fin.desktop.logging.ILogger;
 import fin.desktop.logging.LoggerFactory;
 
@@ -20,6 +22,8 @@ public class RuntimeConfiguration {
     private var _onConnectionClose: Function;
     private var _onConnectionError: Function;
     private var logger:ILogger;
+
+    private static var ane: OpenfinNativeExtention;
 
     /**
      * Constructor
@@ -159,6 +163,21 @@ public class RuntimeConfiguration {
 
     public static function enableConsoleLogging():void {
         LoggerFactory.addConsoleLogger();
+    }
+
+    /**
+     * Enable logging from native extension
+     *
+     * If consoleWindow is true, logFilePath is being ignored
+     *
+     * @param logFilePath  path to log file
+     * @param consoleWindow true to write logs to parent process's console.  Useful when running in IDE
+     */
+    public static function enableNativeExtensionLogging(logFilePath: String, consoleWindow: Boolean): void {
+        if (!ane) {
+            ane = new OpenfinNativeExtention();
+        }
+        ane.enableLogging(logFilePath, consoleWindow);
     }
 
 }

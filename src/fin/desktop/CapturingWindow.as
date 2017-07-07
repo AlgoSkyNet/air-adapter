@@ -49,6 +49,14 @@ public class CapturingWindow {
         });
     }
 
+    public function detach(callback: Function = null): void {
+        var ret: int = this.ane.detachAirWindow(_parentHWND, _hwnd);
+        if (_callBack) {
+            var args:Array = [ret];
+            _callBack.apply(this, args);
+        }
+    }
+
     private function onParentAppCreated(): void {
         logger.info("onParentAppCreated", _appOptopns.uuid);
         _parentWindow = new Window(this._appOptopns.uuid, this._appOptopns.uuid);
@@ -66,7 +74,6 @@ public class CapturingWindow {
         _parentWindow.addEventListener("shown", onParentAppShown);
         _parentWindow.addEventListener("focused", onParentAppFocused);
         _parentWindow.getNativeId(function (data:String): void {
-            trace(data);
             _parentHWND = data;
             logger.debug("sending capturing request for", _hwnd, " to ", _parentHWND);
             var ret: int = ane.captureAirWindow(_parentHWND, _hwnd, _captureOptions.borderTop,
@@ -75,7 +82,6 @@ public class CapturingWindow {
                 var args:Array = [ret];
                 _callBack.apply(this, args);
             }
-
         });
 
     }
@@ -87,17 +93,31 @@ public class CapturingWindow {
 
     private function onParentAppShown(event: WindowEvent): void {
         if (_parentHWND) {
-            logger.debug("updating bounds on shown", event.type, _parentHWND, _hwnd);
-            ane.updateCaptureWindowBounds(_parentHWND, _hwnd);
-            // the following 2 moveBy trigger bounds-changing events so updateCaptureWindowBounds is called to adjust bounds of Ahr window to fit OpenFin window
-//            _parentWindow.moveBy(1,0);
-//           _parentWindow.moveBy(-1,0);
+            _parentWindow.getState(function (state): void {
+                if (state === "normal" || state === "maximized") {
+                    logger.debug("updating bounds on shown", event.type, _parentHWND, _hwnd);
+                    ane.updateCaptureWindowBounds(_parentHWND, _hwnd);
+                } else {
+                    logger.debug("ignoring onParentAppShown with state ", state);
+                }
+            });
+
         }
     }
 
     private function onParentAppFocused(event: WindowEvent): void {
-        logger.debug("activate on focus", event.type, _parentHWND, _hwnd);
-        ane.updateCaptureWindowFocus(_parentHWND, _hwnd);
+        if (_parentHWND) {
+            _parentWindow.getState(function (state): void {
+                if (state === "normal" || state === "maximized") {
+                    logger.debug("activate on focus", event.type, _parentHWND, _hwnd);
+                    ane.updateCaptureWindowFocus(_parentHWND, _hwnd);
+                } else {
+                    logger.debug("ignoring onParentAppFocused with state ", state);
+                }
+            });
+
+        }
+
     }
 
 }

@@ -214,13 +214,14 @@ public class DesktopConnection extends EventDispatcher{
         }
 
         var json: Object = {action: action, payload: payload, messageId: _messageId};
-        var message: String = JSON.stringify(json, _jsonFilter);
+        var message: String = JSON.stringify(json);
         _webSocket.sendUTF(message);
 
         _logger.debug("SENT: ", message);
         return _messageId++;
     }
 
+    // not sure why we need _jsonFilter,  removing from the call to JSON.stringify
     private function _jsonFilter(key: String, value: *): * {
 
         if(!value && value !== false){

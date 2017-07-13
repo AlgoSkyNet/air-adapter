@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--  Not completed yet.  Work in progress -->
+
+    <groupId>co.openfin</groupId>
+    <artifactId>OpenFinAirAdapter</artifactId>
+    <version>6.0.1</version>
+    <packaging>swf</packaging>
+
+    <name>OpenFinAirAdapter</name>
+    <description>The Air API for OpenFin Runtime</description>
+    <url>http://www.openfin.co</url>
+
+    <properties>
+        <user.name>support@openfin.co</user.name>
+        <flex.version>4.5.1.21328</flex.version>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <email>support@openfin.co</email>
+            <name>OpenFin</name>
+            <url>https://openfin.co</url>
+            <id>openfin</id>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:hg:https://github.com/openfin/air-adapter.git</connection>
+        <developerConnection>scm:hg:https://github.com/openfin/air-adapter.git</developerConnection>
+        <url>https://github.com/openfin/air-adapter.git</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.adobe.flex</groupId>
+            <artifactId>compiler</artifactId>
+            <version>${flex.version}</version>
+            <type>pom</type>
+        </dependency>
+        <!--dependency>
+            <groupId>com.adobe.flex.framework</groupId>
+            <artifactId>flex-framework</artifactId>
+            <version>${flex.version}</version>
+            <type>pom</type>
+        </dependency-->
+
+        <dependency>
+            <groupId>com.adobe.flex.framework</groupId>
+            <artifactId>air-framework</artifactId>
+            <version>${flex.version}</version>
+            <type>pom</type>
+        </dependency>
+
+    </dependencies>
+
+    <!-- https://github.com/justinjmoses/flexmojos-introduction -->
+cls
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.flexmojos</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <version>4.0-RC2</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <configurationReport>true</configurationReport>
+                    <warnings>
+                        <arrayTostringChanges>true</arrayTostringChanges>
+                        <duplicateArgumentNames>false</duplicateArgumentNames>
+                    </warnings>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>asdoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>flex-mojos-repository</id>
+            <url>https://repository.sonatype.org/content/groups/flexgroup</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>flex-mojos-plugin-repository</id>
+            <url>https://repository.sonatype.org/content/groups/flexgroup</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+
+</project>

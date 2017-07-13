@@ -348,7 +348,7 @@ public class System {
     private function _onAddEventListenerResponse(type: String, listener: Function, callback: Function): void{
 
         _eventManager.addEventListener(type, listener);
-        callback;
+        callback();
     }
 
     /**

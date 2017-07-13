@@ -14,7 +14,6 @@ import flash.display.NativeWindow;
 import flash.utils.getQualifiedClassName;
 
 public class CapturingWindow {
-    public static var AIR_WINDOW_CLASSNAME: String = "ApolloRuntimeContentWindow";
 
     private var ane: OpenfinNativeExtention;
     private var _nativeWindow: NativeWindow;
@@ -31,7 +30,7 @@ public class CapturingWindow {
 
     public function CapturingWindow(nativeWindow: NativeWindow) {
         this.ane = new OpenfinNativeExtention();
-        this._hwnd = ane.getHWND(AIR_WINDOW_CLASSNAME, nativeWindow.title);
+        this._hwnd = ane.getHWND(ExternalWindow.AIR_WINDOW_CLASSNAME, nativeWindow.title);
         this._nativeWindow = nativeWindow;
         logger = LoggerFactory.getLogger(getQualifiedClassName(CapturingWindow));
     }
@@ -43,7 +42,7 @@ public class CapturingWindow {
         this._errorCallback = errorCallback;
         this._parentApp = new Application(applicationOptions, onParentAppCreated, function (err:*): void {
             logger.info("Error creating capturing app", applicationOptions.uuid);
-            if (_errorCallback) {
+            if (_errorCallback is Function) {
                 _errorCallback.apply(this, err);
             }
         });
@@ -51,7 +50,7 @@ public class CapturingWindow {
 
     public function detach(callback: Function = null): void {
         var ret: int = this.ane.detachAirWindow(_parentHWND, _hwnd);
-        if (_callBack) {
+        if (_callBack is Function) {
             var args:Array = [ret];
             _callBack.apply(this, args);
         }
@@ -62,7 +61,7 @@ public class CapturingWindow {
         _parentWindow = new Window(this._appOptopns.uuid, this._appOptopns.uuid);
         _parentApp.run(onParentAppStarted, function (err:*): void  {
             logger.info("Error starting capturing app", _appOptopns.uuid);
-            if (_errorCallback) {
+            if (_errorCallback is Function) {
                 _errorCallback.apply(this, err);
             }
         });
@@ -78,7 +77,7 @@ public class CapturingWindow {
             logger.debug("sending capturing request for", _hwnd, " to ", _parentHWND);
             var ret: int = ane.captureAirWindow(_parentHWND, _hwnd, _captureOptions.borderTop,
                     _captureOptions.borderRight, _captureOptions.borderBottom, _captureOptions.borderLeft);
-            if (_callBack) {
+            if (_callBack is Function) {
                 var args:Array = [ret];
                 _callBack.apply(this, args);
             }
@@ -93,7 +92,7 @@ public class CapturingWindow {
 
     private function onParentAppShown(event: WindowEvent): void {
         if (_parentHWND) {
-            _parentWindow.getState(function (state): void {
+            _parentWindow.getState(function (state: String): void {
                 if (state === "normal" || state === "maximized") {
                     logger.debug("updating bounds on shown", event.type, _parentHWND, _hwnd);
                     ane.updateCaptureWindowBounds(_parentHWND, _hwnd);
@@ -107,7 +106,7 @@ public class CapturingWindow {
 
     private function onParentAppFocused(event: WindowEvent): void {
         if (_parentHWND) {
-            _parentWindow.getState(function (state): void {
+            _parentWindow.getState(function (state: String): void {
                 if (state === "normal" || state === "maximized") {
                     logger.debug("activate on focus", event.type, _parentHWND, _hwnd);
                     ane.updateCaptureWindowFocus(_parentHWND, _hwnd);

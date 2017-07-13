@@ -311,7 +311,7 @@ public class Window extends DesktopEventManager{
         sendMessage("restore-window", createPayload(), callback, errorCallback);
     }
 
-    public function setBounds(left: Number, top: Number, width, height, callback: Function = null, errorCallback: Function = null): void{
+    public function setBounds(left: Number, top: Number, width: Number, height: Number, callback: Function = null, errorCallback: Function = null): void{
 
         sendMessage("set-window-bounds", createPayload({left: left, top: top, width:width, height:height}), callback, errorCallback);
     }

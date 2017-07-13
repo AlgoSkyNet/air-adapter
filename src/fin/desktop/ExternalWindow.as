@@ -49,13 +49,15 @@ public class ExternalWindow extends Window{
     public const VK_RETURN: uint = 0x0D;
     public const VK_SPACE: uint = 0x20;
 
+    public static var AIR_WINDOW_CLASSNAME: String = "ApolloRuntimeContentWindow";
+
     public function ExternalWindow(nativeWindow: NativeWindow, uuid: String, name: String, callback: Function = null, errorCallback: Function = null) {
 
         super (uuid, name);
         this.callBack = callback;
         _nativeWindow = nativeWindow;
         if(!ane)ane = new OpenfinNativeExtention();
-        hwnd = ane.getHWND(nativeWindow.title, nativeWindow.title);
+        hwnd = ane.getHWND(AIR_WINDOW_CLASSNAME, nativeWindow.title);
         sendMessage("register-external-window", {topic: "application", hwnd: hwnd , uuid:uuid, name: name}, onRegister, errorCallback);
         addEventListener(WindowEvent.FRAME_DISABLED, this._onFrameDisabled);
         addEventListener(WindowEvent.FRAME_ENABLED, this._onFrameEnabled);
@@ -65,7 +67,7 @@ public class ExternalWindow extends Window{
     }
 
 
-    private function onRegister(message): void{
+    private function onRegister(message: *): void{
 
         trace(message);
     }

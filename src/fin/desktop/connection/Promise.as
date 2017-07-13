@@ -49,7 +49,7 @@ public class Promise {
 
     private function callMethod(method: Function, ...args): void{
 
-        if(method) {
+        if(method is Function) {
 
             method.apply(null, args);
             _executed = true;

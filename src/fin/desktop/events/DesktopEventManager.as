@@ -52,7 +52,7 @@ public class DesktopEventManager {
     private function addEventListenerCallback(type: String, listener: Function, callback: Function): void{
 
         _eventDispatcher.addEventListener(type, listener);
-        if(callback) callback();
+        if(callback is Function) callback();
     }
 
     /**
@@ -78,7 +78,7 @@ public class DesktopEventManager {
     private function removeEventListenerCallback(type: String, listener: Function, callback: Function): void{
 
         _eventDispatcher.removeEventListener(type, listener);
-        if(callback) callback();
+        if(callback is Function) callback();
     }
 
     protected function createPayload(object: Object = null):Object {

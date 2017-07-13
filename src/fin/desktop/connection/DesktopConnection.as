@@ -41,7 +41,7 @@ public class DesktopConnection extends EventDispatcher{
     public static function getInstance(): DesktopConnection{
         return _instance;
     }
-    public function DesktopConnection(uuid: String, host: String, port: String, onReady: Function, onError: Function = null, onClose = null) {
+    public function DesktopConnection(uuid: String, host: String, port: String, onReady: Function, onError: Function = null, onClose: Function = null) {
 
         if(_instance) {
             if (_instance._webSocket && _instance._webSocket.connected) {
@@ -89,7 +89,7 @@ public class DesktopConnection extends EventDispatcher{
             _webSocket.connect();
         } catch (error: *){
 
-            if(_onError) _onError(error.message);
+            if(_onError is Function) _onError(error.message);
         }
         _valid = true;
     }
@@ -139,7 +139,7 @@ public class DesktopConnection extends EventDispatcher{
             case "preAuth":
                 if(response.payload.success === false) {
 
-                    if(_onError) _onError(response.payload.reason);
+                    if(_onError is Function) _onError(response.payload.reason);
                 } else {
 
                     writeTokenToTheFile(response.payload);
@@ -190,7 +190,7 @@ public class DesktopConnection extends EventDispatcher{
 
     private function callMethod(method: Function, ...args): void{
 
-        if(method) {
+        if(method is Function) {
             if(method.length) {
 
                 method.apply(null, args);
@@ -208,23 +208,22 @@ public class DesktopConnection extends EventDispatcher{
 
     public function sendMessage(action: String, payload: Object = null, onMessage: Function = null, onError: Function = null): int{
 
-        if(_messageId > 0 && (onMessage || onError)){
+        if(_messageId > 0 && ((onMessage is Function) || (onError is Function))){
 
             _messageHandlers["ack" + _messageId] = {success: onMessage, fail: onError};
         }
 
         var json: Object = {action: action, payload: payload, messageId: _messageId};
-        var message: String = JSON.stringify(json);
+        var message: String = JSON.stringify(json, _jsonFilter);
         _webSocket.sendUTF(message);
 
         _logger.debug("SENT: ", message);
         return _messageId++;
     }
 
-    // not sure why we need _jsonFilter,  removing from the call to JSON.stringify
     private function _jsonFilter(key: String, value: *): * {
 
-        if(!value && value !== false){
+        if(!value && value !== false && value !== 0){
 
             return undefined ;
 
@@ -236,22 +235,22 @@ public class DesktopConnection extends EventDispatcher{
 
     private function onClose(event: WebSocketEvent): void  {
         _logger.debug("onClose", event.toString());
-        if (_onClose) _onClose(event.type);
+        if (_onClose is Function) _onClose(event.type);
     }
 
     private function onConnectionFail(event: WebSocketErrorEvent): void{
         _logger.debug("onConnectionFail", event.text);
-        if(_onError) _onError(event.errorID + ", " + event.text);
+        if(_onError is Function) _onError(event.errorID + ", " + event.text);
     }
 
     private function onAbnormalConnection(event: WebSocketErrorEvent): void{
         _logger.debug("onAbnormalConnection", event.text);
-        if(_onError) _onError(event.errorID + ", " + event.text);
+        if(_onError is Function) _onError(event.errorID + ", " + event.text);
     }
 
     private function onIOError(event: IOErrorEvent): void{
         _logger.debug("onIOError", event.errorID, event.text);
-        if(_onError) _onError(event.errorID + ", " + event.text);
+        if(_onError is Function) _onError(event.errorID + ", " + event.text);
     }
     
     public function get valid():Boolean {

@@ -88,7 +88,7 @@ public class InterApplicationBus {
         var onResponse: Function = function(): void {
 
             _eventManager.addEventListener(eventType, listener);
-            if(callback)callback();
+            if(callback is Function)callback();
         }
         sendMessage("subscribe", {sourceUuid: sourceUuid, topic: topic}, onResponse, errorCallback);
     }

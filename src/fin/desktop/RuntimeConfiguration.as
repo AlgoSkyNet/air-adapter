@@ -22,6 +22,21 @@ public class RuntimeConfiguration {
     private var _onConnectionClose: Function;
     private var _onConnectionError: Function;
     private var logger:ILogger;
+	
+	private var _devToolsPort:int;
+    private var _runtimeVersion:String = "stable";
+    private var _runtimeFallbackVersion:String;
+    private var _securityRealm:String;
+    private var _additionalRuntimeArguments:String;
+	private var _startupApp:Object;
+    private var _appAssets:Array;
+    private var _rdmURL:String;
+    private var _runtimeAssetURL:String;
+    private var _additionalRvmArguments:String;
+    private var _licenseKey:String;
+    private var _configMap:Object;  // used to add any random config setting to app json file
+    private var _launchWithRVM:Boolean = false;  // true -> launch RVM instead of installer
+    private var _showInstallerUI:Boolean = false;  // default to silent mode
 
     private static var ane: OpenfinNativeExtention;
 
@@ -176,6 +191,281 @@ public class RuntimeConfiguration {
         }
         ane.enableLogging(logFilePath, false);
     }
+	
+	/**
+     * Set version number of Runtime to launch
+     * @param version version number
+     */
+	public function set runtimeVersion(runtimeVersion:String):void 
+	{
+		this._runtimeVersion = runtimeVersion;
+	}
+	
+	/**
+     * Get version number of Runtime
+     * @return version of Runtime
+     */
+	public function get runtimeVersion():String 
+	{
+		return this._runtimeVersion;
+	}
+	
+	/**
+     * Set configuration of startup application.
+     *
+     * @param startupApp configuration in JSON format
+     */
+	public function set startupApp(startupApp:Object):void 
+	{
+		this._startupApp = startupApp;
+	}
+	
+	/**
+     * Get fallback version number of Runtime to launch
+     *
+     * @return fallback version
+     */
+	public function get runtimeFallbackVersion():String 
+	{
+		return _runtimeFallbackVersion;
+	}
+	
+	/**
+     * Set fallback version number of Runtime to launch
+     *
+     * @param runtimeFallbackVersion fallback version of Runtime
+     */
+	public function set runtimeFallbackVersion(value:String):void 
+	{
+		_runtimeFallbackVersion = value;
+	}
+	
+	/**
+     * Set additional arguments for Runtime
+     *
+     * @param additionalRuntimeArguments additional arguments
+     */
+	public function set additionalRuntimeArguments(value:String):void 
+	{
+		_additionalRuntimeArguments = value;
+	}
+	
+	/**
+     * Get security realm
+     * @return security realm
+     */
+	public function get securityRealm():String 
+	{
+		return _securityRealm;
+	}
+	
+	/**
+     * Set security realm of Runtime
+     *
+     * @param securityRealm name of security realm
+     */
+	public function set securityRealm(value:String):void 
+	{
+		_securityRealm = value;
+	}
+	
+	/**
+     * Get URL of RDM service
+     *
+     * @return URL of RDM service
+     */
+	public function get rdmURL():String 
+	{
+		return _rdmURL;
+	}
+	
+	/**
+     * Set URL of RDM service
+     *
+     * @param rdmURL RDM URL
+     */
+	public function set rdmURL(value:String):void 
+	{
+		_rdmURL = value;
+	}
+	
+	/**
+     * Get URL of Runtime assets
+     *
+     * @return URL of Runtime assets
+     */
+	public function get runtimeAssetURL():String 
+	{
+		return _runtimeAssetURL;
+	}
+	
+	/**
+     * Set URL of Runtime assets, including RVM and Runtime
+     *
+     * @param runtimeAssetURL URL of Runtime assets
+     */
+	public function set runtimeAssetURL(value:String):void 
+	{
+		_runtimeAssetURL = value;
+	}
+	
+	/**
+     * Get additional arguments for RVM and Installer
+     *
+     * @return additional arguments
+     */
+	public function get additionalRvmArguments():String 
+	{
+		return _additionalRvmArguments;
+	}
+	
+	/**
+     * Set additional arguments for RVM and Installer
+     *
+     * @param additionalRvmArguments set additional arguments
+     */
+	public function set additionalRvmArguments(value:String):void 
+	{
+		_additionalRvmArguments = value;
+	}
+	
+	/**
+     * Get license key for Runtime
+     *
+     * @return license key
+     */
+	public function get licenseKey():String 
+	{
+		return _licenseKey;
+	}
+	
+	/**
+     * Set license key for Runtime
+     *
+     * @param licenseKey license key
+     */
+	public function set licenseKey(value:String):void 
+	{
+		_licenseKey = value;
+	}
+	
+	/**
+     * return value of launchWithRVM
+     *
+     * @return true or false
+     */
+	public function get launchWithRVM():Boolean 
+	{
+		return _launchWithRVM;
+	}
+	
+	/**
+     * By default, AIR adapter launches Runtime with OpenFin installer.  If launchWithRVM is true, installer is skipped and RVM is started instead.
+     *
+     * @param launchWithRVM true or false
+     */
+	public function set launchWithRVM(value:Boolean):void 
+	{
+		_launchWithRVM = value;
+	}
+	
+	/**
+     * Get if OpenFinInstaller should be invoked with UI
+     * @return boolean value of showInstallUI
+     */
+	public function get showInstallerUI():Boolean 
+	{
+		return _showInstallerUI;
+	}
+	
+	/**
+     * Set if OpenFinInstaller should be invoked with UI.  Defaults to false
+     *
+     * @param showInstallerUI value of showInstallerUI
+     *
+     */
+	public function set showInstallerUI(value:Boolean):void 
+	{
+		_showInstallerUI = value;
+	}
+	
+	public function get appAssets():Array 
+	{
+		return _appAssets;
+	}
+	
+	public function set appAssets(value:Array):void 
+	{
+		_appAssets = value;
+	}
+	
+	public function addConfigurationItem(name:String, value:*):void 
+	{
+		if (!this._configMap)
+		{
+			this._configMap = new Object();
+		}
+		this._configMap[name] = value;
+	}
+	
+	public function generateRuntimeConfig():String 
+	{
+		var config:Object = new Object();
+		//devToolsPort
+		if (this._devToolsPort > 0)
+		{
+			config.devtools_port = this._devToolsPort;
+		}
+		
+		//runtimeConfig
+		var runtime:Object = new Object();
+		if (this._runtimeVersion)
+		{
+			runtime.version = this._runtimeVersion;
+		}
+		if (this._runtimeFallbackVersion) {
+            runtime.fallbackVersion = this._runtimeFallbackVersion;
+        }
+		config.runtime = runtime;
+		
+		//rdmUrl
+		if (this._rdmURL)
+		{
+			config.rdmUrl = this._rdmURL;
+		}
+		
+		//runtimeAssetsURL
+		if (this._runtimeAssetURL)
+		{
+			config.assetsUrl = this._runtimeAssetURL;
+		}
+		
+		//appAssets
+		if (this._appAssets && this._appAssets.length > 0)
+		{
+			config.appAssets = this._appAssets;
+		}
+		
+		//startup_app
+		config.startup_app = this._startupApp;
+		
+		//additional config items
+		if (this._configMap)
+		{
+			for (var key:* in this._configMap) 
+			{
+				config[key] = this._configMap[key];
+			}
+		}
+		
+		//license key
+		if (this._licenseKey)
+		{
+			config.licenseKey = this._licenseKey;
+		}
+		
+		return JSON.stringify(config);
+	}
 
 }
 }

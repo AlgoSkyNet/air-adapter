@@ -41,7 +41,14 @@ public class RuntimeLauncher {
         logger = LoggerFactory.getLogger(getQualifiedClassName(RuntimeLauncher));
         this.runtimeConfiguration = runtimeConfiguration;
         this.ane = new OpenfinNativeExtention();
-        getAppManifest();
+		if (runtimeConfiguration.appManifestUrl)
+		{
+			getAppManifest();
+		}
+		else 
+		{
+			initialiseProcess();
+		}
     }
 
     private function initialiseProcess(): void{
@@ -73,8 +80,9 @@ public class RuntimeLauncher {
             workExec = runtimeExec;
             workPath = workDir.nativePath;
         }
-        var args: String = "--config=" + this.runtimeConfiguration.appManifestUrl +
-                            ' --runtime-arguments=--runtime-information-channel-v6=' + namedPipeName + installerArgs;
+        var args: String = "--config=" + createRVMConfig(runtimeConfiguration) 
+							+ ((runtimeConfiguration.showInstallerUI) ? " " : " --no-installer-ui ")
+							+ ' --runtime-arguments="--v=1 --runtime-information-channel-v6=' + namedPipeName + '"' + installerArgs;
         logger.debug("invoking ", workPath, workExec, args);
         ane.launchRuntime(workPath, workExec, args, "chrome." + namedPipeName, runtimeConfiguration.connectionTimeout);
     }
@@ -167,6 +175,27 @@ private function onOutputData(event: ProgressEvent): void{
         logger.debug("runtime version from manifest", runtimeVersion);
         initialiseProcess();
     }
+	
+	public static function createRVMConfig(cfg:RuntimeConfiguration):String
+	{
+		if (!cfg.appManifestUrl)
+		{
+			var appCfgFile:File = File.createTempFile();
+			var stream:FileStream = new FileStream();
+			stream.open(appCfgFile, FileMode.WRITE);
+			var configContent:String = cfg.generateRuntimeConfig();
+			stream.writeUTFBytes(configContent);
+			stream.close();
+			trace("app.json file: " + appCfgFile.nativePath);
+			trace("app.json content: " + configContent);
+			return appCfgFile.nativePath;
+		}
+		else 
+		{
+			return cfg.appManifestUrl;
+		}
+	}
+
 
 }
 }

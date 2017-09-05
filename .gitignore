@@ -72,3 +72,4 @@ fabric.properties
 
 air-adapter.iml
 .idea/
+*.pk12

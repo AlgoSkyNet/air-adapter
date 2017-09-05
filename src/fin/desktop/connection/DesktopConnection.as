@@ -148,8 +148,12 @@ public class DesktopConnection extends EventDispatcher{
                 break;
 
             case "auth":
-                _state =  "authorized";
-                _onReady();
+                if(response.payload.success === false) {
+                    if(_onError is Function) _onError(response.payload.reason);
+                } else {
+                    _state = "authorized";
+                    _onReady();
+                }
                 break;
 
             case "authorized":

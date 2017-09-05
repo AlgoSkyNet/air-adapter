@@ -183,13 +183,14 @@ public class RuntimeConfiguration {
     /**
      * Enable logging from native extension
      *
-     * @param logFilePath  path to log file
+     * @param logFilePath  path to log file.
+     * @param verbose  true to enable verbose logging
      */
-    public static function enableNativeExtensionLogging(logFilePath: String): void {
+    public static function enableNativeExtensionLogging(logFilePath: String, verbose: Boolean = false): void {
         if (!ane) {
             ane = new OpenfinNativeExtention();
         }
-        ane.enableLogging(logFilePath, false);
+        ane.enableLogging(logFilePath, verbose);
     }
 	
 	/**

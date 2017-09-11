@@ -16,7 +16,7 @@
 4. Update docs on s3
 
     ```
-    aws s3 cp doc  s3://public.openfin.co/test/doc/6.0.2  --cache-control max-age=60 --recursive
+    aws s3 cp doc  s3://cdn.openfin.co/airdocs/x.x.x  --cache-control max-age=60 --recursive
     ```
 
 5. Update swc on s3

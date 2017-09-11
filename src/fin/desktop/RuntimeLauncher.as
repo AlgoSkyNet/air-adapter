@@ -17,8 +17,6 @@ import flash.filesystem.FileMode;
 import flash.filesystem.FileStream;
 import flash.utils.getQualifiedClassName;
 
-import mx.utils.UIDUtil;
-
 public class RuntimeLauncher {
     private var ane: OpenfinNativeExtention;
     private var runtimeExec: String = "OpenFinRVM.exe";
@@ -52,7 +50,9 @@ public class RuntimeLauncher {
     }
 
     private function initialiseProcess(): void{
-        var namedPipeName:String = "OpenfinDesktop." + UIDUtil.createUID();
+        var currTime:Date = new Date();
+        var randomNum:Number = Math.floor(Math.random() * 100000);
+        var namedPipeName:String = "OpenfinAirAdapter." + currTime.getTime() + "." + randomNum;
         logger.debug("calling discoverRuntime ", namedPipeName);
         ane.addEventListener(StatusEvent.STATUS, onStatusEvent);
         var workPath: String;

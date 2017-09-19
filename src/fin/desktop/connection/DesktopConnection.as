@@ -260,5 +260,21 @@ public class DesktopConnection extends EventDispatcher{
     public function get valid():Boolean {
         return _valid;
     }
+
+    public function set maxReceivedFrameSize(size: uint): void {
+        _webSocket.config.maxReceivedFrameSize = size;
+    }
+
+    public function get maxReceivedFrameSize(): uint {
+        return _webSocket.config.maxReceivedFrameSize;
+    }
+
+    public function set maxMessageSize(size: uint): void {
+        _webSocket.config.maxMessageSize = size;
+    }
+
+    public function get maxMessageSize(): uint {
+        return _webSocket.config.maxMessageSize;
+    }
 }
 }

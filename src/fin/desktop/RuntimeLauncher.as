@@ -113,6 +113,14 @@ public class RuntimeLauncher {
                 desktopConnection = new DesktopConnection(runtimeConfiguration.connectionUuid, "localhost", port,
                         runtimeConfiguration.onConnectionReady, runtimeConfiguration.onConnectionError,
                         runtimeConfiguration.onConnectionClose);
+                if (runtimeConfiguration.maxReceivedFrameSize > 0) {
+                    desktopConnection.maxReceivedFrameSize = runtimeConfiguration.maxReceivedFrameSize;
+                    logger.debug("Setting max frame size", desktopConnection.maxReceivedFrameSize);
+                }
+                if (runtimeConfiguration.maxMessageSize > 0) {
+                    desktopConnection.maxMessageSize = runtimeConfiguration.maxMessageSize;
+                    logger.debug("Setting max message size", desktopConnection.maxMessageSize);
+                }
             } else {
                 logger.debug("Ignoring PortDiscoverySuccessMessage");
             }

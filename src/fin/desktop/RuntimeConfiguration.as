@@ -16,6 +16,8 @@ public class RuntimeConfiguration {
     private var _connectionUuid: String;
     private var _appManifestUrl: String;
     private var _connectionTimeout:Number = 10000;
+	private var _maxMessageSize: uint = 0;  // 0 means using default set by WebSocket library
+	private var _maxReceivedFrameSize:uint = 0;
     private var _runtimeInstallPath: String;
     private var _assetUrl: String;
     private var _onConnectionReady: Function;
@@ -100,6 +102,35 @@ public class RuntimeConfiguration {
         _connectionTimeout = value;
     }
 
+    /**
+	 * Set max message size
+     * @param size
+     */
+    public function set maxReceivedFrameSize(size: uint): void {
+        _maxReceivedFrameSize = size;
+    }
+
+    /**
+     * Get max message size
+     */
+    public function get maxReceivedFrameSize(): uint {
+        return _maxReceivedFrameSize;
+    }
+
+    /**
+	 * Set max frame message size
+     * @param size
+     */
+    public function set maxMessageSize(size: uint): void {
+        _maxMessageSize = size;
+    }
+
+    /**
+     * Get max frame message size
+     */
+    public function get maxMessageSize(): uint {
+        return _maxMessageSize;
+    }
 
     /**
      * Get Runtime asset URL

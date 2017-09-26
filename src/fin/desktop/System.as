@@ -372,6 +372,28 @@ public class System {
         var payload:Object = {"topic": "system", "type": type};
         sendMessage("unsubscribe-to-desktop-event", payload, callback, errorCallback);
     }
+
+    /**
+     * Create a Chromium proxy socket
+     *     options object takes the form:
+     *     {
+     *         url: (string) destination of the proxy socket
+     *     }
+
+     *     The returned object takes the form:
+     *     {
+     *         localPort: (integer) port number the proxy socket is listening to
+     *     }
+     *
+     * @param options
+     * @param callback A function that is called if successful
+     * @param errorCallback A function that is called if the method fails
+     */
+    public function createProxySocket(options: Object, callback: Function, errorCallback: Function = null): void{
+        sendMessage("create-proxy-socket", options, callback, errorCallback);
+    }
+
+
 }
 
 }

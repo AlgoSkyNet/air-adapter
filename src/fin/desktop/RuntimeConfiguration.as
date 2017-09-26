@@ -458,6 +458,9 @@ public class RuntimeConfiguration {
 		if (this._runtimeFallbackVersion) {
             runtime.fallbackVersion = this._runtimeFallbackVersion;
         }
+		if (this._additionalRuntimeArguments != null) {
+			runtime.arguments = this._additionalRuntimeArguments;
+		}
 		config.runtime = runtime;
 		
 		//rdmUrl
@@ -479,8 +482,10 @@ public class RuntimeConfiguration {
 		}
 		
 		//startup_app
-		config.startup_app = this._startupApp;
-		
+		if (this._startupApp != null) {
+            config.startup_app = this._startupApp;
+        }
+
 		//additional config items
 		if (this._configMap)
 		{

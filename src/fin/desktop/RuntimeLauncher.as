@@ -22,8 +22,6 @@ public class RuntimeLauncher {
     private var runtimeExec: String = "OpenFinRVM.exe";
     private var installerExec: String = "OpenFinInstaller.exe";
     private var port: String;
-    private var runtimeVersion: String; // from app manifest
-    private var securityRealm: String;  // from app manifest
     private var desktopConnection: DesktopConnection;
     private var runtimeConfiguration: RuntimeConfiguration;
     private var logger:ILogger;
@@ -131,11 +129,12 @@ public class RuntimeLauncher {
     }
 
     private function matchRuntimeInstance(requestedVersion: String, reportedSecurityRealm: String): Boolean {
-        if (this.runtimeVersion != null && this.securityRealm != null){
-            return this.runtimeVersion == requestedVersion && this.securityRealm == reportedSecurityRealm;
+        if (this.runtimeConfiguration.runtimeVersion != null && this.runtimeConfiguration.securityRealm != null){
+            return this.runtimeConfiguration.runtimeVersion == requestedVersion &&
+                        this.runtimeConfiguration.securityRealm == reportedSecurityRealm;
         }
-        else if (runtimeVersion != null) {
-            return this.runtimeVersion == requestedVersion && reportedSecurityRealm == null;
+        else if (this.runtimeConfiguration.runtimeVersion != null) {
+            return this.runtimeConfiguration.runtimeVersion == requestedVersion && reportedSecurityRealm == null;
         }
         else {
             return false;
@@ -169,18 +168,18 @@ private function onOutputData(event: ProgressEvent): void{
     private function _onJSONLoaded(event: Event): void{
         var urlLoader: URLLoader = event.target as URLLoader;
         var data: Object = JSON.parse(urlLoader.data);
-        runtimeVersion = data.runtime.version;
+        this.runtimeConfiguration.runtimeVersion = data.runtime.version;
         if (data.runtime.arguments != null) {
             var results:Array = data.runtime.arguments.split(" ");
             for (var i:String in results) {
                 var setting: String = results[i];
                 if (setting.indexOf(SECURITY_REALM_SETTING) == 0) {
-                    this.securityRealm = setting.substr(SECURITY_REALM_SETTING.length);
-                    logger.debug("runtime security realm from manifest", this.securityRealm);
+                    this.runtimeConfiguration.securityRealm = setting.substr(SECURITY_REALM_SETTING.length);
+                    logger.debug("runtime security realm from manifest", this.runtimeConfiguration.securityRealm);
                 }
             }
         }
-        logger.debug("runtime version from manifest", runtimeVersion);
+        logger.debug("runtime version from manifest", this.runtimeConfiguration.runtimeVersion);
         initialiseProcess();
     }
 	

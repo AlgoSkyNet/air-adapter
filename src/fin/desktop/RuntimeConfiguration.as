@@ -225,7 +225,9 @@ public class RuntimeConfiguration {
     }
 	
 	/**
-     * Set version number of Runtime to launch
+     * Set version number of Runtime to launch.
+	 * If appManifestUrl is specified, this field is populated with version from appManifestUrl.
+	 *
      * @param version version number
      */
 	public function set runtimeVersion(runtimeVersion:String):void 

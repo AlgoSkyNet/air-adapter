@@ -337,7 +337,9 @@ public class System {
         if(_eventManager.hasEventListener(payload.topic + payload.type)){
 
             _eventManager.addEventListener(payload.topic + payload.type, listener);
-            callback();
+            if (callback is Function) {
+                callback();
+            }
             return;
         }
 
@@ -348,7 +350,9 @@ public class System {
     private function _onAddEventListenerResponse(type: String, listener: Function, callback: Function): void{
 
         _eventManager.addEventListener(type, listener);
-        callback();
+        if (callback is Function) {
+            callback();
+        }
     }
 
     /**
@@ -364,8 +368,9 @@ public class System {
 
         //if there are other listeners registered for the type, do not un-subscribe
         if(_eventManager.removeEventListener("system" + type, listener) > 0) {
-
-            callback();
+            if (callback is Function) {
+                callback();
+            }
             return;
         }
 
@@ -393,6 +398,20 @@ public class System {
         sendMessage("create-proxy-socket", options, callback, errorCallback);
     }
 
+    /**
+     * Authenticate a Chromium proxy socket
+     *     options object takes the form:
+     *     {
+     *         url: (string) destination of the proxy socket
+     *         username: (string)
+     *         password: (string)
+     *     }
+     *
+     * @param options
+     */
+    public function authenticateProxySocket(options: Object): void{
+        sendMessage("authenticate-proxy-socket", options, null);
+    }
 
 }
 
